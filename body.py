@@ -7,15 +7,15 @@ class body:
         self.state = 'I'
         self.seeside = 1
         self.isground = True
-        self.spd = 10
+        self.spd = 4
 
 
 class character(body):
     def __init__(self):
         body.__init__(self)
-        self.image_char = load_image('./res/char.png')
-        self.image_idle = load_image('./res/char_idle.png')
-        self.image_run = load_image('./res/char_run.png')
+        self.image_char = load_image('./src/char.png')
+        self.image_idle = load_image('./src/char_idle.png')
+        self.image_run = load_image('./src/char_run.png')
         #update later
         #self.image_jump = load_image('./res/char_idle.png')
         #self.image_skil1 = load_image('./res/char_idle.png')
@@ -25,8 +25,10 @@ class character(body):
         self.x, self.y = 210, 163
         self.jumpheight = 90
         self.spdy = self.jumpheight/15
+        #gamefps / 4
         self.gravity = self.spdy / 15
         self.frame = 0
+        self.framesec = 0
         self.skill = None
         self.c_skill_z = 0
         self.c_skill_c = 0
@@ -47,7 +49,10 @@ class character(body):
                 self.spdy = self.jumpheight/15
                 self.isground = True
         if self.state == 'R':
-            self.frame = (self.frame + 1) % 8
+            self.framesec += 1
+            if self.framesec >= 3:
+                self.frame = (self.frame + 1) % 8
+                self.framesec = 0
             self.x += (self.spd * self.seeside)
         elif self.state == 'A':
             self.frame = (self.frame + 1) % 4
@@ -92,25 +97,51 @@ class character(body):
             self.c_skill_v = 5
 
 class monster_body(body):
-    def __init__(self, root, hp, pointXY):
+    def __init__(self, hp, pointXY):
         body.__init__(self)
-        self.image = load_image(root)
         self.hp = hp
         self.x , self.y = pointXY
-
-    def draw(self):
-        if self.seeside == -1:
-            self.image.clip_draw(0, 0, 48, 52, self.x, self.y)
-        elif self.seeside == 1:
-            self.image.clip_draw(48, 0, 48, 52, self.x, self.y)
+        self.nextatktime = 150
+        self.atkdelay = 15 #frame
+        self.time = 0
 
 class monster_sub(monster_body):
-    def __init__(self, root, hp, pointXY):
-        monster_body.__init__(self, root, hp, pointXY)
+    monster1_image = None
+
+    def __init__(self, hp, pointXY):
+        monster_body.__init__(self, hp, pointXY)
+        self.type = 0
+        if monster_sub.monster1_image == None:
+            monster_sub.monster1_image = load_image('./src/mon_sub1.png')
+
+    def draw(self):
+        if self.type == 0:
+            self.monster1_image.clip_draw(24+(24*self.seeside), 0, 48, 52, self.x, self.y)
+
+    # state = i ready to atk, w wait to atktime
+    def update(self, pointXY):
+        if self.state == 'I':
+            if ((math.fabs(pointXY[1] - self.y) <= 120) and (math.fabs(pointXY[0] - self.x) <= 500)):
+                if (pointXY[0] - self.x) >= 0 :
+                    self.seeside = 1
+                else:
+                    self.seeside = -1
+                self.x += (self.seeside * self.spd)
+                # atktime
+                if (math.fabs(pointXY[0] - self.x) <= 20):
+                    self.state = 'W'
+        elif self.state == 'W':
+            self.time += 1
+            if self.time >= self.nextatktime:
+                self.time = 0
+                self.state = 'I'
+
+    def move(self):
+        pass
 
 class monster_main(monster_body):
-    def __init__(self, root, hp, pointXY):
-        monster_body.__init__(self, root, hp, pointXY)
+    def __init__(self, hp, pointXY):
+        monster_body.__init__(self, hp, pointXY)
         self.skill_state = 0
 
     def draw(self):
@@ -125,10 +156,10 @@ class monster_main(monster_body):
 
 class map():
     def __init__(self):
-        self.image_bgi = load_image('./res/bgi_1.png')
-        self.image_ground = load_image('./res/ground_1_G.png')
-        self.image_groundbig = load_image('./res/ground_1_S1.png')
-        self.image_groundsmall = load_image('./res/ground_1_S2.png')
+        self.image_bgi = load_image('./src/bgi_1.png')
+        self.image_ground = load_image('./src/ground_1_G.png')
+        self.image_groundbig = load_image('./src/ground_1_S1.png')
+        self.image_groundsmall = load_image('./src/ground_1_S2.png')
 
     def draw(self):
         self.image_bgi.draw(800,450)
@@ -141,5 +172,6 @@ class map():
         self.image_groundsmall.draw(900,525)
         self.image_groundbig.draw(670,650)
 
-class actionPoint():
-    pass
+class regenPoint():
+    def __init__(self):
+        self.regenpoint = [[(800,171), (1300,171), (600,369), (900,719), (1200,459)]]

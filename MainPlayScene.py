@@ -3,6 +3,7 @@ from random import *
 import game_framework
 import body
 
+
 name = "MainPlayScene"
 Character = None
 Map = None
@@ -13,14 +14,19 @@ Stage = 1
 gametime = 0
 regentime = 10
 running = False
+Rp = None
 
 def enter():
     global Character, Map, Stage, Regenpoint, Monster, running
     Character = body.character()
     Map = body.map()
+    Rp =  body.regenPoint()
     Stage = 1
-    Regenpoint = [(800,171), (1300,171), (600,369), (900,719), (1200,459)]
-    Monster = [body.monster_sub('./res/mon_sub1.png', 20, Regenpoint[randint(0,4)])]
+
+    Regenpoint = Rp.regenpoint[Stage-1]
+    Monster = [body.monster_sub(20, Regenpoint[randint(0,4)])]
+    #test
+    #Monster = [body.monster_sub(20, Regenpoint[randint(0,4)]) for i in range(200)]
     running = True
 
 def exit():
@@ -71,10 +77,12 @@ def handle_events():
 def update():
     global Character, Monster, running, gametime, regentime
     Character.update()
+    for monster in Monster:
+        monster.update((Character.x, Character.y))
     if running == True:
         gametime += 1/60
         if gametime >= regentime:
-            Monster.append(body.monster_sub('./res/mon_sub1.png', 20, Regenpoint[randint(0,4)]))
+            Monster.append(body.monster_sub(20, Regenpoint[randint(0,4)]))
             gametime = 0
 
 
