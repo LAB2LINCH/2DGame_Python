@@ -65,7 +65,6 @@ class character(body.body):
         self.jumpheight = 90
         self.spdy = self.jumpheight / 15
         self.gravity = self.spdy / 15
-        self.frame = 0
         self.framesec = 0
         self.c_skill_z = 0
         self.c_skill_x = 0

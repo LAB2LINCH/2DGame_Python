@@ -13,6 +13,7 @@ Character = None
 Map = None
 Monster = None
 Regenpoint = None
+Regenpoint_b = None
 Monster = None
 Stage = 1
 gametime = 0
@@ -20,14 +21,16 @@ regentime = 10
 Rp = None
 
 def enter():
-    global Character, Map, Stage, Regenpoint, Monster, running
+    global Character, Map, Stage, Regenpoint, Monster, running, Regenpoint_b
     Character = character.character()
     Map = stage.ground()
     Rp =  stage_controller.stage_controller()
     Stage = 1
 
     Regenpoint = Rp.regenpoint[Stage-1]
+    Regenpoint_b = Rp.regenpoint_b[Stage-1]
     Monster = [monster_sub.monster_sub(20, Regenpoint[randint(0,4)])]
+    Monster = [monster_main.monster_main(200, Regenpoint_b[1])]
     #test
     #Monster = [body.monster_sub(20, Regenpoint[randint(0,4)]) for i in range(200)]
     running = True
@@ -50,8 +53,6 @@ def handle_events():
             game_framework.quit()
         else:
             Character.handle_events(event)
-
-
 
 
 

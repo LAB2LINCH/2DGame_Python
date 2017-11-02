@@ -8,4 +8,5 @@ class body:
         self.seeside = 1
         self.isground = True
         self.spd = 4
+        self.frame = 0
 
