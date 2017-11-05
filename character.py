@@ -14,33 +14,83 @@ class character(body.body):
         pass
 
     def handle_z_skill(self): # move
-        if self.c_skill_z >= 1.5:
-            #self.aniemelock = True
+        if self.aniemelock:
+            self.skillsec += 1
+            if self.skillsec >= self.t_skill_z:
+                self.skillsec = 0
+                self.aniemelock = False
+                if self.seeside == -1 and self.leftinput:
+                    self.state = 1
+                elif self.seeside == 1 and self.rightinput:
+                    self.state = 0
+        elif self.c_skill_z >= 1.5:
             self.x += self.spd * 30 * self.seeside
             self.c_skill_z = 0
-        elif self.frame == 7:
-            pass#self.animelock = False
+            self.aniemelock = True
+        else:
+            if self.seeside == -1 and self.leftinput:
+                self.state = 1
+            elif self.seeside == 1 and self.rightinput:
+                self.state = 0
 
     def handle_x_skill(self): # atk
-        if self.c_skill_x >= 0:
-            self.x += self.spd * 30 * self.seeside
+        if self.aniemelock:
+            self.skillsec += 1
+            if self.skillsec >= self.t_skill_x:
+                self.skillsec = 0
+                self.aniemelock = False
+                if self.seeside == -1 and self.leftinput:
+                    self.state = 1
+                elif self.seeside == 1 and self.rightinput:
+                    self.state = 0
+        elif self.c_skill_x >= 0:
             self.c_skill_x = 0
-        elif self.frame == 7:
-            pass#self.animelock = False
+            self.aniemelock = True
+        else:
+            if self.seeside == -1 and self.leftinput:
+                self.state = 1
+            elif self.seeside == 1 and self.rightinput:
+                self.state = 0
 
     def handle_c_skill(self): # 6hit
-        if self.c_skill_c >= 3:
+        if self.aniemelock:
+            self.skillsec += 1
+            if self.skillsec >= self.t_skill_c:
+                self.skillsec = 0
+                self.aniemelock = False
+                if self.seeside == -1 and self.leftinput:
+                    self.state = 1
+                elif self.seeside == 1 and self.rightinput:
+                    self.state = 0
+        elif self.c_skill_c >= 3:
             self.x += self.spd * 30 * self.seeside
             self.c_skill_c = 0
-        elif self.frame == 7:
-            pass#self.animelock = False
+            self.aniemelock = True
+        else:
+            if self.seeside == -1 and self.leftinput:
+                self.state = 1
+            elif self.seeside == 1 and self.rightinput:
+                self.state = 0
 
     def handle_v_skill(self): # area
-        if self.c_skill_v >= 5:
+        if self.aniemelock:
+            self.skillsec += 1
+            if self.skillsec >= self.t_skill_v:
+                self.skillsec = 0
+                self.aniemelock = False
+                if self.seeside == -1 and self.leftinput:
+                    self.state = 1
+                elif self.seeside == 1 and self.rightinput:
+                    self.state = 0
+        elif self.c_skill_v >= 5:
             self.x += self.spd * 30 * self.seeside
             self.c_skill_v = 0
-        elif self.frame == 7:
-            pass#self.animelock = False
+            self.aniemelock = True
+        else:
+            if self.seeside == -1 and self.leftinput:
+                self.state = 1
+            elif self.seeside == 1 and self.rightinput:
+                self.state = 0
 
     handle_state = {
         RIGHT_RUN: handle_run,
@@ -58,7 +108,6 @@ class character(body.body):
     }
 
     def __init__(self):
-        global C_SKILL_Z, C_SKILL_X, C_SKILL_C, C_SKILL_V
         body.body.__init__(self)
         self.image_char = load_image('./src/char.png')
         self.x, self.y = 210, 163
@@ -66,14 +115,21 @@ class character(body.body):
         self.spdy = self.jumpheight / 15
         self.gravity = self.spdy / 15
         self.framesec = 0
+        self.skillsec = 0
         self.c_skill_z = 0
         self.c_skill_x = 0
         self.c_skill_c = 0
         self.c_skill_v = 0
+        self.t_skill_z = 15
+        self.t_skill_x = 4
+        self.t_skill_c = 15
+        self.t_skill_v = 120
         self.state = 2
         self.keydown = 0
         self.aniemelock = False
         self.fps = 60
+        self.leftinput = False
+        self.rightinput = False
 
     def cooldown(self):
         self.c_skill_z += 1 / self.fps
@@ -92,8 +148,8 @@ class character(body.body):
     def update(self):
         self.cooldown()
         self.gravitydrop()
-        if self.state <= 3:
-            self.handle_state[self.state](self)
+        #if self.state <= 3:
+        self.handle_state[self.state](self)
         self.framesec += 1
         if self.framesec >= 3:
             self.frame = (self.frame + 1) % 8
@@ -103,49 +159,73 @@ class character(body.body):
         self.image_char.clip_draw((self.frame*33), (self.state * 36), 33, 36, self.x, self.y)
 
     def handle_events(self, event):
-        if event.type == SDL_KEYDOWN:
+        if((event.type == SDL_KEYDOWN) and (self.aniemelock)):
+            if event.key == SDLK_LEFT:
+                self.seeside = -1
+                self.leftinput = True
+            elif event.key == SDLK_RIGHT:
+                self.seeside = 1
+                self.rightinput = True
+        elif((event.type == SDL_KEYUP) and (self.aniemelock)):
+            if event.key == SDLK_LEFT:
+                self.leftinput = False
+                if self.rightinput == True:
+                    self.seeside = 1
+            elif event.key == SDLK_RIGHT:
+                self.rightinput = False
+                if self.leftinput == True:
+                    self.seeside = -1
+        elif((event.type == SDL_KEYDOWN) and not(self.aniemelock)):
             if (event.key == SDLK_z):
                 self.frame = 0
                 if self.seeside == 1:
-                    self.handle_state[5](self)
+                    self.state = 5
                 else:
-                    self.handle_state[4](self)
+                    self.state = 4
             elif (event.key == SDLK_x):
                 self.frame = 0
                 if self.seeside == 1:
-                    self.handle_state[7](self)
+                    self.state = 7
                 else:
-                    self.handle_state[6](self)
+                    self.state = 6
             elif (event.key == SDLK_c):
                 self.frame = 0
                 if self.seeside == 1:
-                    self.handle_state[9](self)
+                    self.state = 9
                 else:
-                    self.handle_state[8](self)
+                    self.state = 8
             elif (event.key == SDLK_v):
                 self.frame = 0
                 if self.seeside == 1:
-                    self.handle_state[11](self)
+                    self.state = 11
                 else:
-                    self.handle_state[10](self)
+                    self.state = 10
+            elif event.key == SDLK_SPACE:
+                self.isground = False
             elif event.key == SDLK_LEFT:
-                #self.keydown += 1
+                self.leftinput = True
                 self.seeside = -1
                 self.frame = 0
                 self.state = 1
             elif event.key == SDLK_RIGHT:
-                #self.keydown += 1
+                self.rightinput = True
                 self.seeside = 1
                 self.frame = 0
                 self.state = 0
-            elif event.key == SDLK_SPACE:
-                self.isground = False
-        elif event.type == SDL_KEYUP:
-            if ((event.key == SDLK_LEFT) and (self.seeside == -1)):
-                #self.keydown -= 1
-                #if (self.keydown <= 0):
-                    self.state = 2
-            if ((event.key == SDLK_RIGHT) and (self.seeside == 1)):
-                #self.keydown -= 1
-                #if (self.keydown <= 0):
-                    self.state = 3
+        elif ((event.type == SDL_KEYUP) and not(self.aniemelock)):
+            if event.key == SDLK_LEFT:
+                self.leftinput = False
+                if self.seeside == -1:
+                    if self.rightinput:
+                        self.seeside = 1
+                        self.state = 0
+                    else:
+                        self.state = 2
+            elif event.key == SDLK_RIGHT:
+                self.rightinput = False
+                if self.seeside == 1:
+                    if self.leftinput:
+                        self.seeside = -1
+                        self.state = 1
+                    else:
+                        self.state = 3

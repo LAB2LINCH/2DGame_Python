@@ -1,6 +1,7 @@
 from pico2d import *
 from random import *
 import game_framework
+import GameOverScene
 import character
 import monster_main
 import monster_sub
