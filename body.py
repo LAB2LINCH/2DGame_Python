@@ -6,6 +6,5 @@ class body:
         self.state = 0
         self.seeside = 1
         self.isground = True
-        self.spd = 4
         self.frame = 0
 
