@@ -8,3 +8,6 @@ class monster_body(body.body):
         self.nextatktime = 150
         self.atkdelay = 15 #frame
         self.time = 0
+
+    def update(self, frame_time):
+        body.body.update(self, frame_time)

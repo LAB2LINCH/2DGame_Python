@@ -25,6 +25,7 @@ class monster_main(monster_body.monster_body):
         self.framesec2 = 0
         self.atkwaitframe = 30
         self.actionspd = 1
+        self.level = 1
 
     def idle(self, frame_time, pointXY):
         if ((math.fabs(pointXY[1] - self.y) <= 233) and (math.fabs(pointXY[0] - self.x) <= 500)):
@@ -77,18 +78,22 @@ class monster_main(monster_body.monster_body):
     }
     def hitbox(self, type):
         if type == 0:
-            return (self.x + 24, self.y + 26, self. x - 24, self.y - 26)
+            return (self.x - 24, self.y - 26, self. x + 24, self.y + 26)
         if type == 1:
             if self.seeside == -1:
-                return (self.x - 24, self.y + 26, self.x - 48, self.y - 26)
+                return (self.x - 24, self.y - 26, self.x - 48, self.y + 26)
             else:
-                return (self.x + 24, self.y + 26, self.x + 48, self.y - 26)
+                return (self.x + 24, self.y - 26, self.x + 48, self.y + 26)
 
     def draw(self):
         x = (self.state * 556) + (self.seeside * 139) + 139
         monster_main.monster1_image.clip_draw((self.frame*108), x, 108, 278, self.x, self.y)
 
+    def draw_hitbox(self):
+        draw_rectangle(*self.hitbox(0))
+
     def update(self, frame_time, pointXY): #state 0=walk, wait / 1 = atkwait, 2=atk, 3=pattern
+        monster_body.monster_body.update(self, frame_time)
         self.framesec = (self.framesec + 1) % 3
         if self.framesec == 0:
             self.frame = (self.frame + 1) % 4

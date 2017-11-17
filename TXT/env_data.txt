@@ -1,0 +1,7 @@
+[
+    "./src/bgi_1.png",
+    "./src/ground_1_G.png",
+    "./src/ground_1_L.png",
+    "./src/ground_1_S.png",
+    "./src/ground_1_1.png"
+]

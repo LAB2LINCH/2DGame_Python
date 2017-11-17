@@ -118,20 +118,23 @@ class character(body.body):
         R_V_SKILL: handle_v_skill
     }
 
-    def hitbox(self, type):
-        if type == 0: return (self.x + 16, self.y + 18, self.x - 16, self. y - 18)
+    def hitbox(self, type): #idle, atk, skillc, skillv
+        if type == 0: return (self.x - 16, self.y - 18, self.x + 16, self. y + 18)
         elif type == 1:
             if self.seeside == -1:
-               return (self.x + -32, self.y + 18, self.x -16, self.y - 18)
+               return (self.x  -32, self.y - 18, self.x -16, self.y + 18)
             else:
-               return (self.x + 16, self.y + 18, self.x + 32, self.y - 18)
-        elif type == 2: return (self.x + 50, self.y + 54, self.x - 50, self.y - 54)
-        elif type == 3: return (self.x + 240, self.y -10, self.x - 240, self.y - 20)
+               return (self.x + 16, self.y - 18, self.x + 32, self.y + 18)
+        elif type == 2: return (self.x - 50, self.y - 54, self.x + 50, self.y + 54)
+        elif type == 3: return (self.x - 240, self.y -10, self.x + 240, self.y - 20)
+
+    def draw_hitbox(self):
+        draw_rectangle(*self.hitbox(0))
 
     def __init__(self):
         body.body.__init__(self)
         self.image_char = load_image('./src/char.png')
-        self.x, self.y = 210, 163
+        self.x, self.y = 210, 800
         self.jumpheight = 90
         self.spdy = self.jumpheight / 15
         self.gravity = self.spdy / 15
@@ -157,18 +160,9 @@ class character(body.body):
         self.c_skill_c += 1 / self.fps
         self.c_skill_v += 1 / self.fps
 
-    def gravitydrop(self):
-        if self.isground == False:
-            self.y += self.spdy
-            self.spdy -= self.gravity
-            if self.y < 163:
-                self.y = 163
-                self.spdy = self.jumpheight/15
-                self.isground = True
-
     def update(self, frame_time):
+        body.body.update(self, frame_time)
         self.cooldown()
-        self.gravitydrop()
         #if self.state <= 3:
         self.handle_state[self.state](self, frame_time)
         self.framesec += self.FRAMES_PER_ACTION * self.ACTION_PER_TIME * frame_time
@@ -225,7 +219,9 @@ class character(body.body):
                 else:
                     self.state = self.L_V_SKILL
             elif event.key == SDLK_SPACE:
-                self.isground = False
+                if self.isground:
+                    self.y += 70 #jump
+                    self.isground = False
             elif event.key == SDLK_LEFT:
                 self.leftinput = True
                 self.seeside = self.LEFTSIDE

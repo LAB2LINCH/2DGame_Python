@@ -3,48 +3,38 @@ from random import *
 import game_framework
 import GameOverScene
 import character
-import monster_main
-import monster_sub
 import stage_controller
-import stage
 
 
 name = "MainPlayScene"
 Character = None
-Map = None
-Monster = None
-Regenpoint = None
-Regenpoint_b = None
-Monster = None
-Stage = 1
-gametime = 0
-regentime = 3
-Rp = None
+Stage_ctrl = None
 
+Stage = 1
 
 def collision(a, b): #body = 0
-    a_RIGHT, a_DOWN, a_LEFT, a_UP = a
-    b_RIGHT, b_DOWN, b_LEFT, b_UP = b
+    a_LEFT, a_DOWN, a_RIGHT, a_UP = a
+    b_LEFT, b_DOWN, b_RIGHT, b_UP = b
 
-    if a_RIGHT > b_LEFT: return False
-    if a_LEFT < b_RIGHT: return False
+    if a_RIGHT < b_LEFT: return False
+    if a_LEFT > b_RIGHT: return False
     if a_UP < b_DOWN: return False
     if a_DOWN > b_UP: return False
     return True
 
-def enter():
-    global Character, Map, Stage, Regenpoint, Monster, running, Regenpoint_b
-    Character = character.character()
-    Map = stage.ground()
-    Rp =  stage_controller.stage_controller()
-    Stage = 1
+def collision_G(a, b): #a = moveable
+    a_DOWN= a[1]
+    b_UP = b[3]
 
-    Regenpoint = Rp.regenpoint[Stage-1]
-    Regenpoint_b = Rp.regenpoint_b[Stage-1]
-    Monster = [monster_sub.monster_sub(20, Regenpoint[randint(0,4)])]
-    Monster = [monster_main.monster_main(200, Regenpoint_b[1])]
-    #test
-    #Monster = [body.monster_sub(20, Regenpoint[randint(0,4)]) for i in range(200)]
+    if a_DOWN > b_UP: return False
+    return True
+
+def enter():
+    global Character, Map, Stage, running, Stage_ctrl
+    Character = character.character()
+    Stage_ctrl = stage_controller.stage_controller(Stage)
+
+    Stage = 1
     running = True
 
 def exit():
@@ -66,39 +56,48 @@ def handle_events(frame_time):
         else:
             Character.handle_events(frame_time, event)
 
-
-
 def update(frame_time):
-    global Character, Monster, running, gametime, regentime
+    global Character, running, Stage_ctrl
     Character.update(frame_time)
-    for monster in Monster:
-        monster.update(frame_time, (Character.x, Character.y))
-    if running == True:
-        gametime += frame_time
-        if gametime >= regentime:
-            Monster.append(monster_sub.monster_sub(20, Regenpoint[randint(0,4)]))
-            gametime = 0
-#char - mon_skill
-#char - block
-#char - ladder
-#mon - block
+    Stage_ctrl.update(frame_time, (Character.x, Character.y))
 
-        if (Character.state // 2) in (3, 4, 5):
+    if (Character.state // 2) in (3, 4, 5):
             #mon - char_atk
             #mon - char_skill1
             #mon - char_skill2
-            pass
-        for monster in Monster: #char - mon_atk
-            if (monster.state == monster.ATK):
-                collision(Character.hitbox(0), monster.hitbox(1))
+        pass
 
+    for monster in Stage_ctrl.Monster:
+        if (monster.state == monster.ATK):
+            if (collision(Character.hitbox(0), monster.hitbox(1))):#char - mon_atk
+                pass
+        elif monster.level == 0:
+            if monster.state == monster.SKILL1:#char - mon_skill
+                pass
 
+    for block in Stage_ctrl._BLOCK:
+        if Character.isground == False:
+            if (collision(Character.hitbox(0), block.hitbox())):#char - block
+                Character.onground()
+
+    for monster in Stage_ctrl.Monster:
+        if monster.isground == False:
+            for block in Stage_ctrl._BLOCK:
+                if (collision(monster.hitbox(0), block.hitbox())):#mon - block
+                    monster.isground == True
+                    break;
+
+    for useable in Stage_ctrl._USEABLE:
+        if (collision(Character.hitbox(0), useable.hitbox())):#char - ladder
+                pass
 
 def draw(frame_time):
-    global Character, Map, Regenpoint, Monster
+    global Character
     clear_canvas()
-    Map.draw()
+
+    Stage_ctrl.draw()
     Character.draw()
-    for mon in Monster:
-        mon.draw()
+
+    Character.draw_hitbox()
+
     update_canvas()

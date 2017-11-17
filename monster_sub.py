@@ -11,11 +11,12 @@ class monster_sub(monster_body.monster_body):
 
     monster1_image = None
 
-    RUN, IDLE, ATK = 0, 1, 2
+    IDLE, RUN, ATK, ATKWAIT, SKILL1 = 0, 1, 2, 3, 4
 
     def __init__(self, hp, pointXY):
         monster_body.monster_body.__init__(self, hp, pointXY)
         self.type = 0
+        self.level = 0
         if monster_sub.monster1_image == None:
             monster_sub.monster1_image = load_image('./src/mon_sub1.png')
 
@@ -25,15 +26,19 @@ class monster_sub(monster_body.monster_body):
 
     def hitbox(self, type):
         if type == 0:
-            return (self.x + 24, self.y + 26, self. x - 24, self.y - 26)
+            return (self.x - 24, self.y - 26, self. x + 24, self.y + 26)
         if type == 1:
             if self.seeside == -1:
-                return (self.x - 24, self.y + 26, self.x - 48, self.y - 26)
+                return (self.x - 24, self.y - 26, self.x - 48, self.y + 26)
             else:
-                return (self.x + 24, self.y + 26, self.x + 48, self.y - 26)
+                return (self.x + 24, self.y - 26, self.x + 48, self.y + 26)
+
+    def draw_hitbox(self):
+        draw_rectangle(*self.hitbox(0))
 
     # state = i ready to atk, w wait to atktime
     def update(self, frame_time, pointXY):
+        monster_body.monster_body.update(self, frame_time)
         if self.state == self.RUN:
             if ((math.fabs(pointXY[1] - self.y) <= 120) and (math.fabs(pointXY[0] - self.x) <= 500)):
                 if (pointXY[0] - self.x) >= 0 :
