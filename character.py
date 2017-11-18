@@ -8,10 +8,6 @@ class character(body.body):
     RIGHT_RUN, LEFT_RUN, RIGHT_IDLE, LEFT_IDLE = 0, 1, 2, 3
     R_Z_SKILL, L_Z_SKILL, R_X_SKILL, L_X_SKILL, R_C_SKILL, L_C_SKILL, R_V_SKILL, L_V_SKILL = 4, 5, 6, 7, 8, 9, 10, 11
 
-    TIME_PER_ACTION = 0.5
-    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 8
-
     LEFTSIDE, RIGHTSIDE = -1, 1
 
     LEFT, RIGHT = 0, 1
@@ -68,7 +64,7 @@ class character(body.body):
                 self.skillsec = 0
                 self.aniemelock = False
                 self.change_state()
-        elif self.c_skill_x >= 0.1:
+        elif self.c_skill_x >= 0.5:
             self.ATK = True
             self.c_skill_x = 0
             self.aniemelock = True
@@ -117,6 +113,8 @@ class character(body.body):
         L_V_SKILL: handle_v_skill,
         R_V_SKILL: handle_v_skill
     }
+    def down(self):
+        self.isground = False
 
     def hitbox(self, type): #idle, atk, skillc, skillv
         if type == 0: return (self.x - 16, self.y - 18, self.x + 16, self. y + 18)
@@ -137,10 +135,7 @@ class character(body.body):
     def damage(self):
         return self._damage
 
-    def onground(self, y):
-        self.isground = True
-        self.down_spd = 0
-        self.y = (y + (self.imagesize_y//2))
+
 
     def __init__(self):
         body.body.__init__(self)
@@ -163,7 +158,6 @@ class character(body.body):
         self.leftinput = False
         self.rightinput = False
         self.imagesize_y = 34
-        self.canmove = [True, True]
         self.ATK = False
 
     def cooldown(self, frame_time):
@@ -245,6 +239,9 @@ class character(body.body):
                 self.seeside = 1
                 self.frame = 0
                 self.state = self.RIGHT_RUN
+            elif event.key == SDLK_DOWN:
+                if self.x >= 300:
+                    self.down()
         elif ((event.type == SDL_KEYUP) and not(self.aniemelock)):
             if event.key == SDLK_LEFT:
                 self.leftinput = False

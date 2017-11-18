@@ -16,6 +16,7 @@ class monster_sub(monster_body.monster_body):
         self.randomx = random.randint(0,10)
         self.runtime = 2.5
         self.sleeptime = random.randint(5,15) / 10
+        self.imagesize_y = 52
         if monster_sub.monster1_image == None:
             monster_sub.monster1_image = load_image('./src/mon_sub1.png')
 
@@ -57,7 +58,10 @@ class monster_sub(monster_body.monster_body):
             if self.time >= self.runtime:
                 self.time = 0
                 self.state = self.SLEEP
-            self.x += (self.seeside * self.RUN_SPEED_PPS * frame_time)
+            if self.seeside == -1 and self.canmove[0]:
+                self.x += (self.seeside * self.RUN_SPEED_PPS * frame_time)
+            elif self.seeside == 1 and self.canmove[1]:
+                self.x += (self.seeside * self.RUN_SPEED_PPS * frame_time)
             if (math.fabs(pointXY[0] - self.x) <= (15 + self.randomx*2)):
                 self.time = 0
                 self.state = self.ATKWAIT

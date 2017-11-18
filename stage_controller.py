@@ -10,12 +10,15 @@ class stage_controller():
     _BGI = None
     _BLOCK = []
     _USEABLE = []
-    Monster = None
+    Monster = []
 
-    _Regen_time = 8
+    _Regen_time = 3
 
     def stageChange(self, stage):
         self.stage = stage
+        self.BOSS = False
+        self.BOSS_Alive = True
+        self.gen_count = 0
 
         '''
         stage_data_file = open('./TXT/stage_data.txt', 'r')
@@ -35,8 +38,8 @@ class stage_controller():
             (3, 680, 340),
             (2, 1050, 390),
             (3, 1330, 430),
-            (3, 900, 525),
-            (2, 670, 650)]]
+            (3, 900, 550),
+            (2, 670, 675)]]
 
         regen_data = [
             {"NORMAL":[(800,171), (1300,171), (600,369), (900,719), (1200,459)],
@@ -60,11 +63,7 @@ class stage_controller():
         self.stage = stage
         self.gametime = 0
         self.regen_time = 0
-
         self.stageChange(stage)
-
-        self.Monster = [monster_sub.monster_sub(20, self.regenpoint[randint(0, 4)])]
-        self.Monster.append(monster_main.monster_main(200, self.regenpoint_b[1]))
 
     def draw(self):
         self._BGI.image.draw(self._BGI.x, self._BGI.y)
@@ -89,7 +88,11 @@ class stage_controller():
             monster.update(frame_time, pointXY)
         self.gametime += frame_time
         self.regen_time += frame_time
-        if self.regen_time >= self._Regen_time:
+        if self.regen_time >= self._Regen_time and self.BOSS_Alive:
             self.Monster.append(monster_sub.monster_sub(20, self.regenpoint[randint(0, 4)]))
             self.regen_time = 0
+            self.gen_count += 1
+        if self.gen_count >= 12 and not self.BOSS:
+            self.Monster.append(monster_main.monster_main(200, self.regenpoint_b[1]))
+            self.BOSS = True
 

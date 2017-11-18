@@ -80,7 +80,7 @@ def update(frame_time):
     for monster in Stage_ctrl.Monster:
         if (monster.state == monster.ATK):
             if (collision(Character.hitbox(0), monster.hitbox(1))):#char - mon_atk
-                pass
+                print("AAAAAA")
         elif monster.level == 0:
             if monster.state == monster.SKILL1:#char - mon_skill
                 pass
@@ -105,48 +105,64 @@ def update(frame_time):
                         Stage_ctrl.Monster.remove(monster)
     Character.ATK = False
 
-    groundcheck = False
     for block in Stage_ctrl._BLOCK:
-        side = collision_ADD(Character.hitbox(0), block.hitbox())
+        side = collision_ADD(Character.hitbox(0), block.hitbox())  # mon - block
         if side == FALSE:
-            if block.collisionflag == DOWN:
-                block.collisionflag = FALSE
-                break
-            elif block.collisionflag in (LEFT, RIGHT):
-                Character.canmove[block.collisionflag-2] = True
-                block.collisionflag = FALSE
-                break
-        elif side == DOWN:#char - block
-            if math.fabs((block.return_ground_y() + (Character.imagesize_y // 2)) - Character.y) <= 5:
-                block.collisionflag = DOWN
-                Character.onground(block.return_ground_y())
-                groundcheck = True
-        elif side == LEFT:
-            block.collisionflag = LEFT
-            Character.canmove[LEFT-2] = False
-        elif side == RIGHT:
-            block.collisionflag = RIGHT
-            Character.canmove[RIGHT-2] = False
+            if block == Character.d_block:
+                Character.d_block = None
+            elif block == Character.l_block:
+                Character.l_block = None
+            elif block == Character.r_block:
+                Character.r_block = None
+        elif side == DOWN and Character.d_block != block:
+            Character.onground(block.return_ground_y())
+            Character.d_block = block
+            if Character.l_block == block: Character.l_block = None
+            elif Character.r_block == block: Character.r_block = None
+        elif side == LEFT and Character.l_block != block:
+            Character.canmove[LEFT - 2] = False
+            Character.l_block = block
+            if Character.d_block == block: Character.d_block = None
+            elif Character.r_block == block: Character.r_block = None
+        elif side == RIGHT and Character.r_block != block:
+            Character.canmove[RIGHT - 2] = False
+            Character.r_block = block
+            if Character.l_block == block: Character.l_block = None
+            elif Character.d_block == block: Character.d_block = None
+        if Character.d_block == None: Character.isground = False
+        if Character.l_block == None: Character.canmove[LEFT - 2] = True
+        if Character.r_block == None: Character.canmove[RIGHT - 2] = True
 
-    if not groundcheck:
-        Character.isground = False
-        Character.canmove[LEFT-2] = True
-        Character.canmove[RIGHT-2] = True
-
-    for monster in Stage_ctrl.Monster:
-        monster.c_block = False
+    # 벽 - 몬스터 바닥 충돌 시 onground, 옆 충돌시 off, 부딪히면 각 배열에 저장해서 다음 비교에 빠지면 빼줌
 
     for monster in Stage_ctrl.Monster:
         for block in Stage_ctrl._BLOCK:
-            if math.fabs(monster.x - block.x) <= block.image.w\
-                    and math.fabs(monster.y - block.y) <= block.image.h:
-                if (collision(monster.hitbox(0), block.hitbox())):#mon - block
-                    monster.isground == True
-                    monster.c_block = True
-
-    for monster in Stage_ctrl.Monster:
-        if monster.c_block == False:
-            monster.isground = False
+            side = collision_ADD(monster.hitbox(0), block.hitbox())  # mon - block
+            if side == FALSE:
+                if block == monster.d_block:
+                    monster.d_block = None
+                elif block == monster.l_block:
+                    monster.l_block = None
+                elif block == monster.r_block:
+                    monster.r_block = None
+            elif side == DOWN and monster.d_block != block:
+                monster.onground(block.return_ground_y())
+                monster.d_block = block
+                if monster.l_block == block: monster.l_block = None
+                elif monster.r_block == block: monster.r_block = None
+            elif side == LEFT and monster.l_block != block:
+                monster.canmove[LEFT - 2] = False
+                monster.l_block = block
+                if monster.d_block == block: monster.d_block = None
+                elif monster.r_block == block: monster.r_block = None
+            elif side == RIGHT and monster.r_block != block:
+                monster.canmove[RIGHT - 2] = False
+                monster.r_block = block
+                if monster.l_block == block: monster.l_block = None
+                elif monster.d_block == block: monster.d_block = None
+            if monster.d_block == None: monster.isground = False
+            if monster.l_block == None: monster.canmove[LEFT - 2] = True
+            if monster.r_block == None: monster.canmove[RIGHT - 2] = True
 
     for useable in Stage_ctrl._USEABLE:
         if (collision(Character.hitbox(0), useable.hitbox())):#char - ladder

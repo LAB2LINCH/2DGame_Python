@@ -11,6 +11,10 @@ class body:
     JUMP_HEIGHT_P = (JUMP_HEIGHT * PIXEL_PER_METER)
     JUMP_TIME = 0.8
 
+    TIME_PER_ACTION = 0.5
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 8
+
     JUMP_START = ((JUMP_HEIGHT_P * 2) / (JUMP_TIME / 2))
 
     GRAVITY_P = (JUMP_START / (JUMP_TIME/ 2))
@@ -24,3 +28,12 @@ class body:
         self.down_spd = 10
         self.x, self.y = 0, 0
         self.imagesize_y = 0
+        self.canmove = [True, True]
+        self.l_block = None
+        self.r_block = None
+        self.d_block = None
+
+    def onground(self, y):
+        self.isground = True
+        self.down_spd = 0
+        self.y = (y + (self.imagesize_y//2))
