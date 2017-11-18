@@ -3,11 +3,7 @@ import body
 
 class character(body.body):
 
-    PIXEL_PER_METER = (10.0 / 0.4)  # 10 pixel 30 cm
-    RUN_SPEED_KMPH = 35  # Km / Hour
-    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
-    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
-    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
 
     RIGHT_RUN, LEFT_RUN, RIGHT_IDLE, LEFT_IDLE = 0, 1, 2, 3
     R_Z_SKILL, L_Z_SKILL, R_X_SKILL, L_X_SKILL, R_C_SKILL, L_C_SKILL, R_V_SKILL, L_V_SKILL = 4, 5, 6, 7, 8, 9, 10, 11
@@ -18,90 +14,94 @@ class character(body.body):
 
     LEFTSIDE, RIGHTSIDE = -1, 1
 
+    LEFT, RIGHT = 0, 1
+
     def handle_run(self, frame_time):
+        if self.seeside == -1:
+            if not self.canmove[self.LEFT]:
+                return
+        if self.seeside == 1:
+            if not self.canmove[self.RIGHT]:
+                return
         self.x += (self.RUN_SPEED_PPS * self.seeside * frame_time)
 
     def handle_idle(self, frame_time):
         pass
 
+    def handle_jump(self, frame_time):
+
+        self.down_spd = self.JUMP_START
+        self.isground = False
+        self.y += 3
+
+    def change_state(self):
+        if self.seeside == self.LEFTSIDE:
+            if self.leftinput:
+                self.state = self.LEFT_RUN
+            else:
+                self.state = self.LEFT_IDLE
+        elif self.seeside == self.RIGHTSIDE:
+            if self.rightinput:
+                self.state = self.RIGHT_RUN
+            else:
+                self.state = self.RIGHT_IDLE
+
     def handle_z_skill(self, frame_time): # move
         if self.aniemelock:
-            self.skillsec += 1
+            self.skillsec += frame_time
             if self.skillsec >= self.t_skill_z:
                 self.skillsec = 0
                 self.aniemelock = False
-                if self.seeside == self.LEFTSIDE and self.leftinput:
-                    self.state = self.LEFT_RUN
-                elif self.seeside == self.RIGHTSIDE and self.rightinput:
-                    self.state = self.RIGHT_RUN
+                self.change_state()
         elif self.c_skill_z >= 1.5:
             self.x += self.RUN_SPEED_PPS * self.seeside * 0.5
+            self.ATK = True
             self.c_skill_z = 0
             self.aniemelock = True
         else:
-            if self.seeside == self.LEFTSIDE and self.leftinput:
-                self.state = self.LEFT_RUN
-            elif self.seeside == self.RIGHTSIDE and self.rightinput:
-                self.state = self.RIGHT_RUN
+            self.change_state()
 
     def handle_x_skill(self, frame_time): # atk
         if self.aniemelock:
-            self.skillsec += 1
+            self.skillsec += frame_time
             if self.skillsec >= self.t_skill_x:
                 self.skillsec = 0
                 self.aniemelock = False
-                if self.seeside == self.LEFTSIDE and self.leftinput:
-                    self.state = self.LEFT_RUN
-                elif self.seeside == self.RIGHTSIDE and self.rightinput:
-                    self.state = self.RIGHT_RUN
-        elif self.c_skill_x >= 0:
+                self.change_state()
+        elif self.c_skill_x >= 0.1:
+            self.ATK = True
             self.c_skill_x = 0
             self.aniemelock = True
         else:
-            if self.seeside == self.LEFTSIDE and self.leftinput:
-                self.state = self.LEFT_RUN
-            elif self.seeside == self.RIGHTSIDE and self.rightinput:
-                self.state = self.RIGHT_RUN
+            self.change_state()
 
     def handle_c_skill(self, frame_time): # 6hit
         if self.aniemelock:
-            self.skillsec += 1
+            self.skillsec += frame_time
             if self.skillsec >= self.t_skill_c:
                 self.skillsec = 0
                 self.aniemelock = False
-                if self.seeside == self.LEFTSIDE and self.leftinput:
-                    self.state = self.LEFT_RUN
-                elif self.seeside == self.RIGHTSIDE and self.rightinput:
-                    self.state = self.RIGHT_RUN
+                self.change_state()
         elif self.c_skill_c >= 3:
-            self.x += self.spd * 30 * self.seeside
+            self.ATK = True
             self.c_skill_c = 0
             self.aniemelock = True
         else:
-            if self.seeside == self.LEFTSIDE and self.leftinput:
-                self.state = self.LEFT_RUN
-            elif self.seeside == self.RIGHTSIDE and self.rightinput:
-                self.state = self.RIGHT_RUN
+            self.change_state()
 
     def handle_v_skill(self, frame_time): # area
         if self.aniemelock:
-            self.skillsec += 1
+            self.skillsec += frame_time
             if self.skillsec >= self.t_skill_v:
                 self.skillsec = 0
                 self.aniemelock = False
-                if self.seeside == self.LEFTSIDE and self.leftinput:
-                    self.state = self.LEFT_RUN
-                elif self.seeside == self.RIGHTSIDE and self.rightinput:
-                    self.state = self.RIGHT_RUN
+                self.change_state()
         elif self.c_skill_v >= 5:
-            self.x += self.spd * 30 * self.seeside
+            self.ATK = True
             self.c_skill_v = 0
             self.aniemelock = True
         else:
-            if self.seeside == self.LEFTSIDE and self.leftinput:
-                self.state = self.LEFT_RUN
-            elif self.seeside == self.RIGHTSIDE and self.rightinput:
-                self.state = self.RIGHT_RUN
+            self.change_state()
 
     handle_state = {
         RIGHT_RUN: handle_run,
@@ -126,49 +126,63 @@ class character(body.body):
             else:
                return (self.x + 16, self.y - 18, self.x + 32, self.y + 18)
         elif type == 2: return (self.x - 50, self.y - 54, self.x + 50, self.y + 54)
-        elif type == 3: return (self.x - 240, self.y -10, self.x + 240, self.y - 20)
+        elif type == 3: return (self.x - 240, self.y - 20, self.x + 240, self.y + 20)
 
     def draw_hitbox(self):
         draw_rectangle(*self.hitbox(0))
+        draw_rectangle(*self.hitbox(1))
+        draw_rectangle(*self.hitbox(2))
+        draw_rectangle(*self.hitbox(3))
+
+    def damage(self):
+        return self._damage
+
+    def onground(self, y):
+        self.isground = True
+        self.down_spd = 0
+        self.y = (y + (self.imagesize_y//2))
 
     def __init__(self):
         body.body.__init__(self)
         self.image_char = load_image('./src/char.png')
         self.x, self.y = 210, 800
-        self.jumpheight = 90
-        self.spdy = self.jumpheight / 15
-        self.gravity = self.spdy / 15
         self.framesec = 0
         self.skillsec = 0
         self.c_skill_z = 0
         self.c_skill_x = 0
         self.c_skill_c = 0
         self.c_skill_v = 0
-        self.t_skill_z = 15
-        self.t_skill_x = 4
-        self.t_skill_c = 15
-        self.t_skill_v = 120
+        self.t_skill_z = 0.25
+        self.t_skill_x = 1/15
+        self.t_skill_c = 0.25
+        self.t_skill_v = 2
+        self._damage = 10
         self.state = 2
         self.keydown = 0
         self.aniemelock = False
-        self.fps = 60
         self.leftinput = False
         self.rightinput = False
+        self.imagesize_y = 34
+        self.canmove = [True, True]
+        self.ATK = False
 
-    def cooldown(self):
-        self.c_skill_z += 1 / self.fps
-        self.c_skill_c += 1 / self.fps
-        self.c_skill_v += 1 / self.fps
+    def cooldown(self, frame_time):
+        self.c_skill_z += frame_time
+        self.c_skill_x += frame_time
+        self.c_skill_c += frame_time
+        self.c_skill_v += frame_time
 
     def update(self, frame_time):
-        body.body.update(self, frame_time)
-        self.cooldown()
+        self.cooldown(frame_time)
         #if self.state <= 3:
         self.handle_state[self.state](self, frame_time)
         self.framesec += self.FRAMES_PER_ACTION * self.ACTION_PER_TIME * frame_time
         self.frame = (int)(self.framesec) % 8
+        if self.isground == False:
+            self.down_spd -= self.GRAVITY_P * frame_time
+            self.y += self.down_spd * frame_time
 
-    def draw(self) :
+    def draw(self):
         if self.state in (self.L_Z_SKILL, self.L_C_SKILL, self.L_X_SKILL, self.L_V_SKILL):
             self.image_char.clip_draw((self.frame*33), 108, 33, 36, self.x, self.y)
         elif self.state in (self.R_Z_SKILL, self.R_C_SKILL, self.R_X_SKILL, self.R_V_SKILL):
@@ -220,8 +234,7 @@ class character(body.body):
                     self.state = self.L_V_SKILL
             elif event.key == SDLK_SPACE:
                 if self.isground:
-                    self.y += 70 #jump
-                    self.isground = False
+                    self.handle_jump(frame_time)
             elif event.key == SDLK_LEFT:
                 self.leftinput = True
                 self.seeside = self.LEFTSIDE

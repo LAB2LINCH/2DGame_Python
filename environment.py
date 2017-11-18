@@ -3,10 +3,13 @@ from pico2d import *
 class env():
     image = None
 
+    UP, LEFT, RIGHT, DOWN, FALSE = 1, 2, 3, 4, 0
+
     def __init__(self, type, pointXY):
         global image
         self.x = pointXY[0]
         self.y = pointXY[1]
+        self.collisionflag = self.FALSE
 
         '''
         env_data_file = open('./TXT/env_data.txt', 'r')
@@ -29,6 +32,9 @@ class env():
 
     def hitbox(self):
         return ((self.x - (self.w//2)), (self.y - (self.h//2)), (self.x + (self.w//2)), (self.y + (self.h//2)))
+
+    def return_ground_y(self):
+        return (self.y + (self.h//2))
 
     def draw_hitbox(self):
         draw_rectangle(*self.hitbox())

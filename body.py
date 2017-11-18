@@ -2,8 +2,18 @@ from pico2d import *
 
 class body:
     PIXEL_PER_METER = (10.0 / 0.4)  # 10 pixel 40 cm
-    DOWN_GRAVITY = 30
-    DOWN_SPD = (DOWN_GRAVITY * PIXEL_PER_METER)
+    RUN_SPEED_KMPH = 35  # Km / Hour
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+    JUMP_HEIGHT = 8 #max Meter
+    JUMP_HEIGHT_P = (JUMP_HEIGHT * PIXEL_PER_METER)
+    JUMP_TIME = 0.8
+
+    JUMP_START = ((JUMP_HEIGHT_P * 2) / (JUMP_TIME / 2))
+
+    GRAVITY_P = (JUMP_START / (JUMP_TIME/ 2))
 
     def __init__(self):
         #see side left = -1, right = 1
@@ -12,12 +22,5 @@ class body:
         self.isground = True
         self.frame = 0
         self.down_spd = 10
-
-    def update(self, frame_time):
-        if self.isground == False:
-            self.down_spd += (int)(self.DOWN_SPD * frame_time)
-            self.y -= (int)(self.down_spd * frame_time)
-
-    def onground(self):
-        self.isground = True
-        self.down_spd = 0
+        self.x, self.y = 0, 0
+        self.imagesize_y = 0

@@ -4,12 +4,6 @@ import monster_body
 class monster_main(monster_body.monster_body):
     monster1_image = None
 
-    PIXEL_PER_METER = (10.0 / 0.4)  # 10 pixel 30 cm
-    RUN_SPEED_KMPH = 30  # Km / Hour
-    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
-    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
-    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
-
     IDLE, RUN, ATKWAIT, ATK, SKILL1 = 0, 1, 2, 3, 4
 
     LEFTSIDE, RIGHTSIDE = -1, 1
@@ -93,7 +87,6 @@ class monster_main(monster_body.monster_body):
         draw_rectangle(*self.hitbox(0))
 
     def update(self, frame_time, pointXY): #state 0=walk, wait / 1 = atkwait, 2=atk, 3=pattern
-        monster_body.monster_body.update(self, frame_time)
         self.framesec = (self.framesec + 1) % 3
         if self.framesec == 0:
             self.frame = (self.frame + 1) % 4
