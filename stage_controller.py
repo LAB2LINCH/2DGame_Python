@@ -3,16 +3,22 @@ from random import *
 import environment
 import monster_main
 import monster_sub
+import item
 
 class stage_controller():
     BGI, GROUND, LONG, SHORT, USEABLE = 0, 1, 2, 3, 4
+    PASSIVE, ACTIVE = 0, 1
 
     _BGI = None
     _BLOCK = []
     _USEABLE = []
     Monster = []
+    item_drop_list = []
+    _item = []
 
     _Regen_time = 3
+    Playtime = 0
+
 
     def stageChange(self, stage):
         self.stage = stage
@@ -65,6 +71,16 @@ class stage_controller():
         self.regen_time = 0
         self.stageChange(stage)
 
+        self.item_drop_list = [[
+            (0, 50),
+            (1, 50)
+        ],[
+            (2, 50),
+            (3, 50)
+        ]]
+        self.passive_item = self.item_drop_list[self.PASSIVE]
+        self.active_item = self.item_drop_list[self.ACTIVE]
+
     def draw(self):
         self._BGI.image.draw(self._BGI.x, self._BGI.y)
         for e in self._BLOCK:
@@ -81,9 +97,35 @@ class stage_controller():
         for monster in self.Monster:
             monster.draw_hitbox()
 
+        for item in self._item:
+            item.draw()
+
+    def drop_item(self, level, pointXY):
+        value = randrange(1,100)
+        if level == 0:
+            if randrange(1,20) <= 1:
+                i=0
+                while value >= self.passive_item[i][1]:
+                    i+=1
+                    value -= self.passive_item[i][1]
+                self._item.append(item.item(i), pointXY)
+        elif level == 1:
+            if randrange(1,10) <= 9:
+                i=0
+                while value >= self.passive_item[i][1]:
+                    i+=1
+                    value -= self.passive_item[i][1]
+                self._item.append(item.item(i), pointXY)
+            else:
+                i=0
+                while value >= self.active_item[i][1]:
+                    i+=1
+                    value -= self.active_item[i][1]
+                self._item.append(item.item(i+self.passive_item.len-1, pointXY))#패시브아이템 개수 -1
 
 
     def update(self, frame_time, pointXY):
+        self.Playtime += frame_time
         for monster in self.Monster:
             monster.update(frame_time, pointXY)
         self.gametime += frame_time

@@ -1,9 +1,8 @@
 from pico2d import *
 import body
+import item
 
 class character(body.body):
-
-
 
     RIGHT_RUN, LEFT_RUN, RIGHT_IDLE, LEFT_IDLE = 0, 1, 2, 3
     R_Z_SKILL, L_Z_SKILL, R_X_SKILL, L_X_SKILL, R_C_SKILL, L_C_SKILL, R_V_SKILL, L_V_SKILL = 4, 5, 6, 7, 8, 9, 10, 11
@@ -11,6 +10,8 @@ class character(body.body):
     LEFTSIDE, RIGHTSIDE = -1, 1
 
     LEFT, RIGHT = 0, 1
+
+    PASSIVE, ACTIVE = 0, 1
 
     def handle_run(self, frame_time):
         if self.seeside == -1:
@@ -137,7 +138,7 @@ class character(body.body):
 
 
 
-    def __init__(self):
+    def __init__(self, itemvalue):
         body.body.__init__(self)
         self.image_char = load_image('./src/char.png')
         self.x, self.y = 210, 800
@@ -154,11 +155,28 @@ class character(body.body):
         self._damage = 10
         self.state = 2
         self.keydown = 0
+        self.critchance = 5
         self.aniemelock = False
         self.leftinput = False
         self.rightinput = False
         self.imagesize_y = 34
         self.ATK = False
+        self.itemlist = []
+        self.itemvalue = itemvalue
+        for i in range(itemvalue): # PASSIVE 아이템
+            self.itemlist.append((i, 0))
+
+    def getitem(self, item):
+        if item.type == 0:
+            self.itemlist[item.id] += 1
+            if item.part == item.ATKPOWER:
+                self._damage += item.value
+            elif item.part == item.CRIT:
+                self.critchance += item.value
+        else:
+            self.itemlist[self.itemvalue] = item.id
+
+
 
     def cooldown(self, frame_time):
         self.c_skill_z += frame_time

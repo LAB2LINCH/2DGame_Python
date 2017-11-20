@@ -4,6 +4,7 @@ import game_framework
 import GameOverScene
 import character
 import stage_controller
+import MenuScene
 
 
 name = "MainPlayScene"
@@ -47,7 +48,7 @@ def collision_ADD(a, b): #body = 0
 
 def enter():
     global Character, Map, Stage, running, Stage_ctrl
-    Character = character.character()
+    Character = character.character(2)
     Stage_ctrl = stage_controller.stage_controller(Stage)
 
     Stage = 1
@@ -68,7 +69,7 @@ def handle_events(frame_time):
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-            game_framework.quit()
+            game_framework.push_state(MenuScene)
         else:
             Character.handle_events(frame_time, event)
 
@@ -167,6 +168,10 @@ def update(frame_time):
     for useable in Stage_ctrl._USEABLE:
         if (collision(Character.hitbox(0), useable.hitbox())):#char - ladder
                 pass
+
+    for item in Stage_ctrl._item:
+        if (collision(Character.hitbox(0), item.hitbox())):
+            Character.getitem(item)
 
 def draw(frame_time):
     global Character

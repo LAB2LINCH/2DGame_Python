@@ -5,6 +5,7 @@ import monster_body
 class monster_sub(monster_body.monster_body):
 
     monster1_image = None
+    item_drop_list = None
 
     IDLE, RUN, ATK, ATKWAIT, SKILL1 = 0, 1, 2, 3, 4
     SLEEP = 8
