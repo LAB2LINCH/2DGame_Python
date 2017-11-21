@@ -134,7 +134,7 @@ class stage_controller():
             self.Monster.append(monster_sub.monster_sub(20, self.regenpoint[randint(0, 4)]))
             self.regen_time = 0
             self.gen_count += 1
-        if self.gen_count >= 12 and not self.BOSS:
+        if self.gen_count >= 6 and not self.BOSS:
             self.Monster.append(monster_main.monster_main(200, self.regenpoint_b[1]))
             self.BOSS = True
 
