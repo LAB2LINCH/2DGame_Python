@@ -103,19 +103,19 @@ class stage_controller():
     def drop_item(self, level, pointXY):
         value = randrange(1,100)
         if level == 0:
-            if randrange(1,20) <= 1:
+            if True: # randrange(1,20) <= 1
                 i=0
                 while value >= self.passive_item[i][1]:
                     i+=1
                     value -= self.passive_item[i][1]
-                self._item.append(item.item(i), pointXY)
+                self._item.append(item.item(i, pointXY))
         elif level == 1:
             if randrange(1,10) <= 9:
                 i=0
                 while value >= self.passive_item[i][1]:
                     i+=1
                     value -= self.passive_item[i][1]
-                self._item.append(item.item(i), pointXY)
+                self._item.append(item.item(i, pointXY))
             else:
                 i=0
                 while value >= self.active_item[i][1]:

@@ -1,5 +1,6 @@
 import game_framework
 import MainPlayScene
+from pico2d import *
 
 name = "MenuScene"
 
@@ -37,9 +38,9 @@ def handle_events(frame_time):
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.pop_state()
-        elif (event.type, event.key) == (SDL_KEWDOWN, SDLK_UP):
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
             menu(UP)
-        elif (event.type, event.key) == (SDL_KEWDOWN, SDLK_DOWN):
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
             menu(DOWN)
 
 def update(frame_time):

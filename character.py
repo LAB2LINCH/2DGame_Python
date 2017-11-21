@@ -164,17 +164,17 @@ class character(body.body):
         self.itemlist = []
         self.itemvalue = itemvalue
         for i in range(itemvalue): # PASSIVE 아이템
-            self.itemlist.append((i, 0))
+            self.itemlist.append([i, 0])
 
     def getitem(self, item):
         if item.type == 0:
-            self.itemlist[item.id] += 1
+            self.itemlist[item.id][1] = self.itemlist[item.id][1] + 1
             if item.part == item.ATKPOWER:
                 self._damage += item.value
             elif item.part == item.CRIT:
                 self.critchance += item.value
         else:
-            self.itemlist[self.itemvalue] = item.id
+            self.itemlist[self.itemvalue][0] = item.id
 
 
 

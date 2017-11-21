@@ -91,18 +91,21 @@ def update(frame_time):
                 print(monster.hp)
                 if Character.ATK:
                     if(monster.damage(Character.damage())):
+                        Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
                         Stage_ctrl.Monster.remove(monster)
         elif (Character.state // 2) == 4:  # mon - char_skill1
             if (collision(Character.hitbox(2), monster.hitbox(0))):
                 print(monster.hp)
                 if Character.ATK:
                     if(monster.damage(Character.damage())):
+                        Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
                         Stage_ctrl.Monster.remove(monster)
         elif (Character.state // 2) == 5:  # mon - char_skill2
             if (collision(Character.hitbox(3), monster.hitbox(0))):
                 print(monster.hp)
                 if Character.ATK:
                     if(monster.damage(Character.damage())):
+                        Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
                         Stage_ctrl.Monster.remove(monster)
     Character.ATK = False
 
@@ -172,6 +175,7 @@ def update(frame_time):
     for item in Stage_ctrl._item:
         if (collision(Character.hitbox(0), item.hitbox())):
             Character.getitem(item)
+            Stage_ctrl._item.remove(item)
 
 def draw(frame_time):
     global Character
