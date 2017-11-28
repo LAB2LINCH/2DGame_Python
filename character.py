@@ -1,6 +1,7 @@
 from pico2d import *
 import body
 import item
+import random
 
 class character(body.body):
 
@@ -26,10 +27,15 @@ class character(body.body):
         pass
 
     def handle_jump(self, frame_time):
-
         self.down_spd = self.JUMP_START
         self.isground = False
         self.y += 3
+
+    def is_down(self):
+        if(self.down_spd <= 0):
+            return True
+        else:
+            return False
 
     def change_state(self):
         if self.seeside == self.LEFTSIDE:
@@ -134,9 +140,10 @@ class character(body.body):
         draw_rectangle(*self.hitbox(3))
 
     def damage(self):
-        return self._damage
-
-
+        if(random.randrange(0,100) <= self.critchance):
+            return (self._damage * 2)
+        else:
+            return self._damage
 
     def __init__(self, itemvalue):
         body.body.__init__(self)
@@ -175,8 +182,6 @@ class character(body.body):
                 self.critchance += item.value
         else:
             self.itemlist[self.itemvalue][0] = item.id
-
-
 
     def cooldown(self, frame_time):
         self.c_skill_z += frame_time
@@ -258,7 +263,7 @@ class character(body.body):
                 self.frame = 0
                 self.state = self.RIGHT_RUN
             elif event.key == SDLK_DOWN:
-                if self.x >= 300:
+                if self.y >= 300:
                     self.down()
         elif ((event.type == SDL_KEYUP) and not(self.aniemelock)):
             if event.key == SDLK_LEFT:

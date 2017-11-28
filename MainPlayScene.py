@@ -118,7 +118,7 @@ def update(frame_time):
                 Character.l_block = None
             elif block == Character.r_block:
                 Character.r_block = None
-        elif side == DOWN and Character.d_block != block:
+        elif side == DOWN and Character.d_block != block and Character.is_down() == True:
             Character.onground(block.return_ground_y())
             Character.d_block = block
             if Character.l_block == block: Character.l_block = None

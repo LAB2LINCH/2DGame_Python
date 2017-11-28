@@ -4,23 +4,28 @@ import monster_body
 class monster_main(monster_body.monster_body):
     monster1_image = None
 
-    IDLE, RUN, ATKWAIT, ATK, SKILL1 = 0, 1, 2, 3, 4
+    IDLE, RUN, ATKWAIT, ATK, SKILL1, SKILL2 = 0, 1, 2, 3, 4, 5
 
     LEFTSIDE, RIGHTSIDE = -1, 1
+
+    BODY, NORMALATK, RANGEATK = 0, 1, 2
 
     def __init__(self, hp, pointXY):
         monster_body.monster_body.__init__(self, hp, pointXY)
         if monster_main.monster1_image == None:
             monster_main.monster1_image = load_image('./src/mon_main1.png')
-        self.c_skill1 = 600
-        self.t_skill1 = 300
+        self.c_skill1 = 10
+        self.c_skill2 = 5
+        self.t_skill1 = 5
         self.skilltime = 0
+        self.skilltime2 = 0
         self.framesec = 0
         self.framesec2 = 0
-        self.atkwaitframe = 30
+        self.atk_wait_time = 0.5
         self.actionspd = 1
         self.level = 1
         self.imagesize_y = 278
+        self.action_time = 1
 
     def idle(self, frame_time, pointXY):
         if ((math.fabs(pointXY[1] - self.y) <= 233) and (math.fabs(pointXY[0] - self.x) <= 500)):
@@ -42,26 +47,37 @@ class monster_main(monster_body.monster_body):
             self.frame = 0
 
     def atkwait(self, frame_time, pointXY):
-        self.framesec2 = (self.framesec2 + 1) % (self.atkwaitframe / self.actionspd)
-        if self.framesec2 == 0:
+        self.framesec2 +=  frame_time
+        if self.framesec2 >= (self.atk_wait_time / self.actionspd):
             self.framesec2 = 0
             if self.skilltime >= self.c_skill1:
                 self.skilltime = 0
                 self.state = self.SKILL1
+            elif self.skilltime2 >= self.c_skill2:
+                self.skilltime2 = 0
+                self.state = self.SKILL2
             else:
                 self.state = self.ATK
 
     def atk(self, frame_time, pointXY):
-        self.framesec2 = (self.framesec2 + 1) % (60 / self.actionspd)
-        if self.framesec2 == 0:
+        self.framesec2 += frame_time
+        if self.framesec2 >= (self.action_time / self.actionspd):
+            self.framesec2 = 0
             self.state = self.IDLE
 
 
     def skill1(self, frame_time, pointXY):
-        self.framesec2 = (self.framesec2 + 1) % (60 / self.actionspd)
-        if self.framesec2 == 0:
+        self.framesec2 += frame_time
+        if self.framesec2 >= (self.action_time / self.actionspd):
+            self.framesec2 = 0
             self.actionspd = 2
             self.skilltime = 0
+            self.state = self.IDLE
+
+    def skill2(self, frame_time, pointXY):
+        self.framesec2 += frame_time
+        if self.framesec2 >= (self.action_time*2 / self.actionspd):
+            self.framesec2 = 0
             self.state = self.IDLE
 
     stateset = {
@@ -69,26 +85,38 @@ class monster_main(monster_body.monster_body):
         IDLE: idle,
         ATKWAIT: atkwait,
         ATK: atk,
-        SKILL1: skill1
+        SKILL1: skill1,
+        SKILL2: skill2
     }
+
     def hitbox(self, type):
-        if type == 0:
+        if type == self.BODY:
             return (self.x - 54, self.y - 139, self. x + 54, self.y)
-        if type == 1:
-            return (self.x - 54, self.y - 139, self. x + 54, self.y)
+        elif type == self.NORMALATK:
+            return (self.x - 81, self.y - 139, self. x + 81, self.y)
+        elif type == self.RANGEATK and self.seeside == -1:
+            return (self.x - 324, self.y - 89, self. x + 54, self.y)
+        elif type == self.RANGEATK and self.seeside == 1:
+            return (self.x - 54, self.y - 89, self. x + 324, self.y)
 
     def draw(self):
-        x = (self.state * 556) + (self.seeside * 139) + 139
+        if self.state >= self.ATKWAIT:
+            x = (self.ATKWAIT * 556) + (self.seeside * 139) + 139
+        else:
+            x = (self.state * 556) + (self.seeside * 139) + 139
         monster_main.monster1_image.clip_draw((self.frame*108), x, 108, 278, self.x, self.y)
 
     def draw_hitbox(self):
         draw_rectangle(*self.hitbox(0))
+        draw_rectangle(*self.hitbox(1))
+        draw_rectangle(*self.hitbox(2))
 
     def update(self, frame_time, pointXY): #state 0=walk, wait / 1 = atkwait, 2=atk, 3=pattern
         self.framesec += self.FRAMES_PER_ACTION * self.ACTION_PER_TIME * frame_time
         self.frame = (int)(self.framesec) % 4
 
-        self.skilltime += 1
+        self.skilltime += frame_time
+        self.skilltime2 += frame_time
         if (self.actionspd > 1 and self.skilltime >= self.t_skill1):
             self.actionspd = 1
 
