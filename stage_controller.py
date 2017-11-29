@@ -131,10 +131,10 @@ class stage_controller():
         self.gametime += frame_time
         self.regen_time += frame_time
         if self.regen_time >= self._Regen_time and self.BOSS_Alive:
-            self.Monster.append(monster_sub.monster_sub(20, self.regenpoint[randint(0, 4)]))
+            self.Monster.append(monster_sub.monster_sub(20, self.regenpoint[randint(0, 4)], self.stage-1))
             self.regen_time = 0
             self.gen_count += 1
         if self.gen_count >= 6 and not self.BOSS:
-            self.Monster.append(monster_main.monster_main(200, self.regenpoint_b[1]))
+            self.Monster.append(monster_main.monster_main(200, self.regenpoint_b[1], self.stage-1))
             self.BOSS = True
 

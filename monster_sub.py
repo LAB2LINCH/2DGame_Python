@@ -1,38 +1,91 @@
 from pico2d import *
 import random
-import monster_body
 
-class monster_sub(monster_body.monster_body):
+class monster_sub():
+    PIXEL_PER_METER = (10.0 / 0.4)  # 10 pixel 40 cm
+    RUN_SPEED_KMPH = 35  # Km / Hour
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
-    monster1_image = None
+    JUMP_HEIGHT = 8  # max Meter
+    JUMP_HEIGHT_P = (JUMP_HEIGHT * PIXEL_PER_METER)
+    JUMP_TIME = 0.8
+
+    TIME_PER_ACTION = 0.5
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 8
+
+    JUMP_START = ((JUMP_HEIGHT_P * 2) / (JUMP_TIME / 2))
+
+    GRAVITY_P = (JUMP_START / (JUMP_TIME / 2))
+
     item_drop_list = None
 
     IDLE, RUN, ATK, ATKWAIT, SKILL1 = 0, 1, 2, 3, 4
     SLEEP = 8
 
-    def __init__(self, hp, pointXY):
-        monster_body.monster_body.__init__(self, hp, pointXY)
+    XSIZE, YSIZE, ROOT = 0,1,2
+
+    monster_sub_data = [
+        (48, 52, './src/mon_sub1.png'),
+        (45, 42, './src/mon_sub2.png')
+    ]
+
+    def __init__(self, hp, pointXY, monster_type):
+        self.hp = hp
+        self.x , self.y = pointXY
+        self.nextatktime = 2.5
+        self.atkdelay = 0.25 #frame
+        self.atktime = 0.5
+        self.time = 0
+        self.c_block = False
+
+        #see side left = -1, right = 1
+        self.state = 0
+        self.seeside = 1
+        self.isground = True
+        self.frame = 0
+        self.down_spd = 10
+        self.imagesize_y = 0
+        self.canmove = [True, True]
+        self.l_block = None
+        self.r_block = None
+        self.d_block = None
         self.type = 0
         self.level = 0
         self.randomx = random.randint(0,10)
         self.runtime = 2.5
         self.sleeptime = random.randint(5,15) / 10
-        self.imagesize_y = 52
-        if monster_sub.monster1_image == None:
-            monster_sub.monster1_image = load_image('./src/mon_sub1.png')
+        self.image_size_x = self.monster_sub_data[monster_type][self.XSIZE]
+        self.image_size_y = self.monster_sub_data[monster_type][self.YSIZE]
+        self.monster_image = load_image(self.monster_sub_data[monster_type][self.ROOT])
+
+    def damage(self, x):
+        self.hp -= x
+        if self.hp <= 0:
+            return True
+
+    def onground(self, y):
+        self.isground = True
+        self.down_spd = 0
+        self.y = (y + (self.imagesize_y//2))
 
     def draw(self):
         if self.type == 0:
-            self.monster1_image.clip_draw(24+(24*self.seeside), 0, 48, 52, self.x, self.y)
+            self.monster_image.clip_draw(24+(24*self.seeside), 0, 48, 52, self.x, self.y)
 
     def hitbox(self, type):
         if type == 0:
-            return (self.x - 24, self.y - 26, self. x + 24, self.y + 26)
+            return (self.x - self.image_size_x//2, self.y - self.image_size_y//2, self. x + self.image_size_x//2, self.y
+                    + self.image_size_y//2)
         if type == 1:
             if self.seeside == -1:
-                return (self.x - 24, self.y - 26, self.x - 48, self.y + 26)
+                return (self.x - self.image_size_x, self.y - self.image_size_y//2, self.x - self.image_size_x//2, self.y
+                        + self.image_size_y//2)
             else:
-                return (self.x + 24, self.y - 26, self.x + 48, self.y + 26)
+                return (self.x + self.image_size_x//2, self.y - self.image_size_y//2, self.x + self.image_size_x, self.y
+                        + self.image_size_y//2)
 
     def draw_hitbox(self):
         draw_rectangle(*self.hitbox(0))
@@ -71,7 +124,7 @@ class monster_sub(monster_body.monster_body):
             if self.time >= self.sleeptime:
                 self.time = 0
                 self.sleeptime = random.randint(5,15) / 10
-                self.state == self.RUN
+                self.state = self.RUN
             if (math.fabs(pointXY[0] - self.x) <= (20 + self.randomx)):
                 self.time = 0
                 self.state = self.ATKWAIT
