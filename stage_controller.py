@@ -138,3 +138,6 @@ class stage_controller():
             self.Monster.append(monster_main.monster_main(200, self.regenpoint_b[1], self.stage-1))
             self.BOSS = True
 
+        for item in self._item:
+            item.update(frame_time)
+

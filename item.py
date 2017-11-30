@@ -16,6 +16,8 @@ class item():
                 ("resetball", self.ACTIVE, self.COOLTIME, 1.5, './src/item_resetball.png')
             ]
 
+        self.spd = 8
+        self.reverse_time = 1
         self.id = id
         self.name = self.item_data[id][0]
         self.part = self.item_data[id][2]  # value가 어디에 사용될껀지
@@ -30,3 +32,10 @@ class item():
 
     def draw(self):
         self.image.draw(self.x, self.y)
+
+    def update(self, frame_time):
+        self.y += self.spd * frame_time
+        self.reverse_time -= frame_time
+        if self.reverse_time <= 0:
+            self.spd *= -1
+            self.reverse_time = 1
