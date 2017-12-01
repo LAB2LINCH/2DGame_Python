@@ -1,7 +1,7 @@
 import game_framework
-import MainPlayScene
+import StartScene
 from pico2d import *
 
 open_canvas(1600,900,False,False)
-game_framework.run(MainPlayScene)
+game_framework.run(StartScene)
 close_canvas()

@@ -47,7 +47,6 @@ class monster_sub():
         self.isground = True
         self.frame = 0
         self.down_spd = 10
-        self.imagesize_y = 0
         self.canmove = [True, True]
         self.l_block = None
         self.r_block = None
@@ -69,7 +68,7 @@ class monster_sub():
     def onground(self, y):
         self.isground = True
         self.down_spd = 0
-        self.y = (y + (self.imagesize_y//2))
+        self.y = (y + (self.image_size_y//2))
 
     def draw(self):
         if self.type == 0:

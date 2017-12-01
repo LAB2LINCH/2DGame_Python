@@ -90,12 +90,14 @@ class stage_controller():
         for monster in self.Monster:
             monster.draw()
 
+        '''
         for e in self._BLOCK:
             e.draw_hitbox()
         for u in self._USEABLE:
             u.draw_hitbox()
         for monster in self.Monster:
             monster.draw_hitbox()
+        '''
 
         for item in self._item:
             item.draw()

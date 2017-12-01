@@ -46,6 +46,7 @@ class monster_main():
         self.l_block = None
         self.r_block = None
         self.d_block = None
+        self.monster_type = monster_type
         self.monster_image = load_image(self.monster_main_data[monster_type][self.ROOT])
         self.image_size_x = self.monster_main_data[monster_type][self.XSIZE]
         self.image_size_y = self.monster_main_data[monster_type][self.YSIZE]
@@ -145,11 +146,17 @@ class monster_main():
             return (self.x - self.image_size_x//2, self.y - self.image_size_y//3, self. x + self.image_size_x*3, self.y)
 
     def draw(self):
-        if self.state >= self.ATKWAIT:
-            x = (self.ATKWAIT * 556) + (self.seeside * 139) + 139
+        if self.monster_type == 1:
+            if self.state >= self.ATKWAIT:
+                x = (self.ATKWAIT * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
+            else:
+                x = (self.state * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
         else:
-            x = (self.state * 556) + (self.seeside * 139) + 139
-        self.monster_image.clip_draw((self.frame*108), x, 108, 278, self.x, self.y)
+            if self.state >= self.ATK:
+                x = (self.ATK * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
+            else:
+                x = (self.state * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
+        self.monster_image.clip_draw((self.frame*self.image_size_x), x, self.image_size_x, self.image_size_y, self.x, self.y)
 
     def draw_hitbox(self):
         draw_rectangle(*self.hitbox(0))
@@ -159,6 +166,10 @@ class monster_main():
     def update(self, frame_time, pointXY): #state 0=walk, wait / 1 = atkwait, 2=atk, 3=pattern
         self.framesec += self.FRAMES_PER_ACTION * self.ACTION_PER_TIME * frame_time
         self.frame = (int)(self.framesec) % self.how_many_frames
+
+        if self.isground == False:
+            self.down_spd -= self.GRAVITY_P * frame_time
+            self.y += self.down_spd * frame_time
 
         self.skilltime += frame_time
         self.skilltime2 += frame_time

@@ -2,18 +2,17 @@ import game_framework
 import MainPlayScene
 from pico2d import *
 
-name = "MenuScene"
+name = "StartScene"
 
 UP, DOWN, SPACE = 0, 1, 2
 select = 0
 bgi = None
 select_arrow = None
-delta_time = 0
 
 def enter():
     global select, bgi, select_arrow
     select = 0
-    bgi = load_image('./src/bgi_menu.png')
+    bgi = load_image('./src/bgi_main_menu.png')
     select_arrow = load_image('./src/menu_select_arrow.png')
 
 def exit():
@@ -25,7 +24,7 @@ def pause():
 def resume():
     pass
 
-def menu(input_key):#MENU 0 == continue, 1 == intro, 2 == EXIT
+def menu(input_key):#MENU 0 == start, 1 == exit
     global select
     if input_key == UP:
         select -= 1
@@ -35,7 +34,7 @@ def menu(input_key):#MENU 0 == continue, 1 == intro, 2 == EXIT
         select = (select + 1) % 2
     elif input_key == SPACE:
         if select == 0:
-            game_framework.pop_state()
+            game_framework.push_state(MainPlayScene)
         else:
             game_framework.quit()
 
@@ -46,7 +45,7 @@ def handle_events(frame_time):
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-            game_framework.pop_state()
+            game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
             menu(UP)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
@@ -55,14 +54,10 @@ def handle_events(frame_time):
             menu(SPACE)
 
 def update(frame_time):
-    global delta_time
-    delta_time += frame_time
-    if delta_time >= 0.5:
-        delta_time = 0
+    pass
 
 def draw(frame_time):
-        clear_canvas()
-        MainPlayScene.draw(frame_time)
-        bgi.draw(800, 450)
-        select_arrow.draw(672, 450-(select*78))
-        update_canvas()
+    clear_canvas()
+    bgi.draw(800, 450)
+    select_arrow.draw(672, 450-(select*78))
+    update_canvas()
