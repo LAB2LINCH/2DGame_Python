@@ -27,6 +27,9 @@ class monster_sub():
 
     XSIZE, YSIZE, ROOT = 0,1,2
 
+    sound_die = None
+    sound_atk = None
+
     monster_sub_data = [
         (48, 52, './src/mon_sub1.png'),
         (45, 42, './src/mon_sub2.png')
@@ -59,10 +62,17 @@ class monster_sub():
         self.image_size_x = self.monster_sub_data[monster_type][self.XSIZE]
         self.image_size_y = self.monster_sub_data[monster_type][self.YSIZE]
         self.monster_image = load_image(self.monster_sub_data[monster_type][self.ROOT])
+        if monster_sub.sound_die == None:
+            monster_sub.sound_die = load_wav("./src/mon_die.wav")
+            monster_sub.sound_die.set_volume(100)
+        if monster_sub.sound_atk == None:
+            monster_sub.sound_atk = load_wav("./src/mon_atk.wav")
+            monster_sub.sound_atk.set_volume(100)
 
     def damage(self, x):
         self.hp -= x
         if self.hp <= 0:
+            monster_sub.sound_die.play()
             return True
 
     def onground(self, y):
@@ -131,6 +141,7 @@ class monster_sub():
             self.time += frame_time
             if self.time >= self.atkdelay:
                 self.time = 0
+                monster_sub.sound_atk.play()
                 self.state = self.ATK
         elif self.state == self.ATK:
             self.time += frame_time

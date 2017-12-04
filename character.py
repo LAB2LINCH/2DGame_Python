@@ -30,6 +30,8 @@ class character():
     LEFT, RIGHT = 0, 1
 
     PASSIVE, ACTIVE = 0, 1
+    sound_skill_v = None
+    sound_normal_atk = None
 
     def handle_run(self, frame_time):
         if self.seeside == -1:
@@ -92,6 +94,7 @@ class character():
             self.ATK = True
             self.c_skill_x = 0
             self.aniemelock = True
+            character.sound_normal_atk.play()
         else:
             self.change_state()
 
@@ -102,6 +105,11 @@ class character():
                 self.skillsec = 0
                 self.aniemelock = False
                 self.change_state()
+                self.atk_count2 = 0
+            self.atk_count = (int)((self.atk_count + (frame_time * 10)) % 4)
+            if self.atk_count == 0 and self.atk_count2 < 6:
+                self.atk_count2 += 1
+                character.sound_normal_atk.play()
         elif self.c_skill_c >= 3:
             self.ATK = True
             self.c_skill_c = 0
@@ -120,6 +128,7 @@ class character():
             self.ATK = True
             self.c_skill_v = 0
             self.aniemelock = True
+            character.sound_skill_v.play()
         else:
             self.change_state()
 
@@ -189,6 +198,8 @@ class character():
         self.t_skill_c = 0.25
         self.t_skill_v = 2
         self._damage = 10
+        self.atk_count = 0
+        self.atk_count2 = 0
         self.state = 2
         self.keydown = 0
         self.critchance = 5
@@ -201,6 +212,13 @@ class character():
         self.itemvalue = itemvalue
         for i in range(itemvalue): # PASSIVE 아이템
             self.itemlist.append([i, 0])
+
+        if character.sound_skill_v == None:
+            character.sound_skill_v = load_wav('./src/earth_skill.wav')
+            character.sound_skill_v.set_volume(100)
+        if character.sound_normal_atk == None:
+            character.sound_normal_atk = load_wav('./src/normal_atk.wav')
+            character.sound_skill_v.set_volume(32)
 
     def onground(self, y):
         self.isground = True
