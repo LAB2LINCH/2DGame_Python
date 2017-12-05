@@ -82,7 +82,7 @@ class monster_sub():
 
     def draw(self):
         if self.type == 0:
-            self.monster_image.clip_draw(24+(24*self.seeside), 0, 48, 52, self.x, self.y)
+            self.monster_image.clip_draw(self.image_size_x//2 + (self.image_size_x//2 * self.seeside), 0, self.image_size_x, self.image_size_y, self.x, self.y)
 
     def hitbox(self, type):
         if type == 0:

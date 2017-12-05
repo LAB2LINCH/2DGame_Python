@@ -70,6 +70,9 @@ def handle_events(frame_time):
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.push_state(MenuScene)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p):
+            Stage_ctrl.stageChange(2)
+            Character.stage_Change()
         else:
             Character.handle_events(frame_time, event)
 

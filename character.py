@@ -171,6 +171,34 @@ class character():
         else:
             return self._damage
 
+    def stage_Change(self):
+        #see side left = -1, right = 1
+        self.state = 0
+        self.seeside = 1
+        self.isground = False
+        self.frame = 0
+        self.down_spd = 10
+        self.canmove = [True, True]
+        self.l_block = None
+        self.r_block = None
+        self.d_block = None
+        self.x, self.y = 210, 800
+        self.framesec = 0
+        self.skillsec = 0
+        self.c_skill_z = 0
+        self.c_skill_x = 0
+        self.c_skill_c = 0
+        self.c_skill_v = 0
+        self.atk_count = 0
+        self.atk_count2 = 0
+        self.state = 2
+        self.keydown = 0
+        self.aniemelock = False
+        self.leftinput = False
+        self.rightinput = False
+        self.ATK = False
+
+
     def __init__(self, itemvalue):
         #see side left = -1, right = 1
         self.state = 0
@@ -178,7 +206,6 @@ class character():
         self.isground = True
         self.frame = 0
         self.down_spd = 10
-        self.x, self.y = 0, 0
         self.imagesize_y = 0
         self.canmove = [True, True]
         self.l_block = None

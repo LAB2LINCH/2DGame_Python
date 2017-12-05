@@ -20,6 +20,9 @@ class stage_controller():
     Playtime = 0
 
 
+    def stopbgm(self):
+        self.bgm.play()
+
     def stageChange(self, stage):
         self.stage = stage
         self.BOSS = False
@@ -45,16 +48,43 @@ class stage_controller():
             (2, 1050, 390),
             (3, 1330, 430),
             (3, 900, 550),
-            (2, 670, 675)]]
+            (2, 670, 675)],
+            [(0, 800, 450),
+             (1, 800, 75),
+             (2, 400, 300),
+             (3, 140, 340),
+             (3, 680, 340),
+             (2, 1050, 390),
+             (3, 1330, 430),
+             (3, 900, 550),
+             (2, 670, 675)],
+            [(0, 800, 450),
+             (1, 800, 75),
+             (2, 400, 300),
+             (3, 140, 340),
+             (3, 680, 340),
+             (2, 1050, 390),
+             (3, 1330, 430),
+             (3, 900, 550),
+             (2, 670, 675)],
+        ]
 
         regen_data = [
             {"NORMAL":[(800,171), (1300,171), (600,369), (900,719), (1200,459)],
-             "BOSS":[(800, 284), (1300, 284)]}
+             "BOSS":[(800, 284), (1300, 284)]},
+            {"NORMAL": [(800, 171), (1300, 171), (600, 369), (900, 719), (1200, 459)],
+             "BOSS": [(800, 284), (1300, 284)]},
+            {"NORMAL": [(800, 171), (1300, 171), (600, 369), (900, 719), (1200, 459)],
+             "BOSS": [(800, 284), (1300, 284)]}
         ]
 
         self.env = stage_data[self.stage-1]
         self.regenpoint = regen_data[self.stage-1]['NORMAL']
         self.regenpoint_b = regen_data[self.stage-1]['BOSS']
+
+        self._BGI = None
+        self._BLOCK = []
+        self._USEABLE = []
 
         for e in self.env:
             if e[0] == self.BGI:
@@ -80,6 +110,8 @@ class stage_controller():
         ]]
         self.passive_item = self.item_drop_list[self.PASSIVE]
         self.active_item = self.item_drop_list[self.ACTIVE]
+        self.bgm = load_wav('./src/bgm.wav')
+        self.bgm.repeat_play()
 
     def draw(self):
         self._BGI.image.draw(self._BGI.x, self._BGI.y)
@@ -136,7 +168,7 @@ class stage_controller():
             self.Monster.append(monster_sub.monster_sub(20, self.regenpoint[randint(0, 4)], self.stage-1))
             self.regen_time = 0
             self.gen_count += 1
-        if self.gen_count >= 6 and not self.BOSS:
+        if self.gen_count >= 1  and not self.BOSS:
             self.Monster.append(monster_main.monster_main(200, self.regenpoint_b[1], self.stage-1))
             self.BOSS = True
 
