@@ -43,7 +43,7 @@ class monster_sub():
         self.atktime = 0.5
         self.time = 0
         self.c_block = False
-        self.sx = self.x
+        self.sx = -100
 
         #see side left = -1, right = 1
         self.state = 0
@@ -108,15 +108,15 @@ class monster_sub():
             self.y += self.down_spd * frame_time
 
         if self.state == self.IDLE:
-            if ((math.fabs(pointXY[1] - self.y) <= 120) and (math.fabs(pointXY[0] - self.x) <= 500)):
-                if (pointXY[0] - self.x) >= 0 :
+            if ((math.fabs(pointXY[1] - self.y) <= 120) and (math.fabs(800 - self.sx) <= 500)):
+                if (800 - self.sx) >= 0 :
                     self.seeside = 1
                 else:
                     self.seeside = -1
                 self.state = self.RUN
         elif self.state == self.RUN:
             self.time += frame_time
-            if (pointXY[0] - self.x) >= 0:
+            if (800 - self.sx) >= 0:
                 self.seeside = 1
             else:
                 self.seeside = -1
@@ -127,7 +127,7 @@ class monster_sub():
                 self.x += (self.seeside * self.RUN_SPEED_PPS * frame_time)
             elif self.seeside == 1 and self.canmove[1]:
                 self.x += (self.seeside * self.RUN_SPEED_PPS * frame_time)
-            if (math.fabs(pointXY[0] - self.x) <= (15 + self.randomx*2)):
+            if (math.fabs(800 - self.sx) <= (15 + self.randomx*2)):
                 self.time = 0
                 self.state = self.ATKWAIT
         elif self.state == self.SLEEP:
@@ -136,7 +136,7 @@ class monster_sub():
                 self.time = 0
                 self.sleeptime = random.randint(5,15) / 10
                 self.state = self.RUN
-            if (math.fabs(pointXY[0] - self.x) <= (20 + self.randomx)):
+            if (math.fabs(800 - self.sx) <= (20 + self.randomx)):
                 self.time = 0
                 self.state = self.ATKWAIT
         elif self.state == self.ATKWAIT:

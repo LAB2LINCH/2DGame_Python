@@ -93,16 +93,17 @@ def update(frame_time):
             if (collision(Character.hitbox(1), monster.hitbox(0))):
                 print(monster.hp)
                 if Character.ATK:
-                    if(monster.damage(Character.damage())):
+                    if(monster.damage(Character.damage()//2)):
                         Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
                         Stage_ctrl.Monster.remove(monster)
         elif (Character.state // 2) == 4:  # mon - char_skill1
             if (collision(Character.hitbox(2), monster.hitbox(0))):
                 print(monster.hp)
                 if Character.ATK:
-                    if(monster.damage(Character.damage())):
+                    if(monster.damage(Character.damage()*3)):
                         Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
                         Stage_ctrl.Monster.remove(monster)
+                        Character.ATK = False
         elif (Character.state // 2) == 5:  # mon - char_skill2
             if (collision(Character.hitbox(3), monster.hitbox(0))):
                 print(monster.hp)
@@ -187,6 +188,6 @@ def draw(frame_time):
     Stage_ctrl.draw()
     Character.draw()
 
-    #Character.draw_hitbox()
+    Character.draw_hitbox()
 
     update_canvas()

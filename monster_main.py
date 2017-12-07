@@ -65,7 +65,7 @@ class monster_main():
         self.actionspd = 1
         self.level = 1
         self.action_time = 1
-        self.sx = self.x
+        self.sx = -100
         '''
         if monster_main.sound_atk == None:
             monster_main.sound_atk = load_wav("./src/boss_sk.wav")
@@ -87,21 +87,21 @@ class monster_main():
             return True
 
     def idle(self, frame_time, pointXY):
-        if ((math.fabs(pointXY[1] - self.y) <= 233) and (math.fabs(pointXY[0] - self.x) <= 500)):
+        if ((math.fabs(pointXY[1] - self.y) <= 233) and (math.fabs(800 - self.sx) <= 500)):
             self.state = self.RUN
-            if (pointXY[0] - self.x) >= 0:
+            if (800 - self.sx) >= 0:
                 self.seeside = self.RIGHTSIDE
             else:
                 self.seeside = self.LEFTSIDE
 
     def run(self, frame_time, pointXY):
-        if (pointXY[0] - self.x) >= 0:
+        if (800 - self.sx) >= 0:
             self.seeside = self.RIGHTSIDE
         else:
             self.seeside = self.LEFTSIDE
         self.x += (self.seeside * self.RUN_SPEED_PPS * self.actionspd * frame_time)
         # atktime
-        if (math.fabs(pointXY[0] - self.x) <= 20):
+        if (math.fabs(800 - self.sx) <= 20):
             self.state = self.ATKWAIT
             self.frame = 0
 

@@ -40,33 +40,37 @@ class stage_controller():
         '''
 
         stage_data = [
+            [(0, 1600, 450),
+            (2, 800, 290),
+            (2, 1200, 480),
+            (2, 1880, 290),
+            (2, 1770, 670),
+            (3, 1470, 540),
+            (3, 2080, 540),
+            (3, 2180, 350),
+            (5, 650, 450),
+            (5, 2550, 450),
+             (1, 1600, 75)],
             [(0, 800, 450),
-            (1, 800, 75),
             (2, 400, 300),
             (3, 140, 340),
             (3, 680, 340),
             (2, 1050, 390),
             (3, 1330, 430),
             (3, 900, 550),
-            (2, 670, 675)],
+            (2, 670, 675),
+            (5, 0, 450),
+             (1, 1600, 75)],
             [(0, 800, 450),
-             (1, 800, 75),
-             (2, 400, 300),
-             (3, 140, 340),
-             (3, 680, 340),
-             (2, 1050, 390),
-             (3, 1330, 430),
-             (3, 900, 550),
-             (2, 670, 675)],
-            [(0, 800, 450),
-             (1, 800, 75),
-             (2, 400, 300),
-             (3, 140, 340),
-             (3, 680, 340),
-             (2, 1050, 390),
-             (3, 1330, 430),
-             (3, 900, 550),
-             (2, 670, 675)],
+            (2, 400, 300),
+            (3, 140, 340),
+            (3, 680, 340),
+            (2, 1050, 390),
+            (3, 1330, 430),
+            (3, 900, 550),
+            (2, 670, 675),
+            (5, 0, 450),
+             (1, 1600, 75)],
         ]
 
         regen_data = [
@@ -116,10 +120,10 @@ class stage_controller():
 
         self.canvas_width = get_canvas_width()
         self.canvas_height = get_canvas_height()
-        self.w = 2200
+        self.w = 3200
 
     def draw(self):
-        self._BGI.image.clip_draw_to_origin(self.window_left, 0, self.canvas_width, self.canvas_height, 0, 0)
+        self._BGI.image.draw(self.canvas_width//2, self.canvas_height//2)
         for e in self._BLOCK:
             e.draw()
         for u in self._USEABLE:
@@ -127,14 +131,14 @@ class stage_controller():
         for monster in self.Monster:
             monster.draw()
 
-        '''
+
         for e in self._BLOCK:
             e.draw_hitbox()
         for u in self._USEABLE:
             u.draw_hitbox()
         for monster in self.Monster:
             monster.draw_hitbox()
-        '''
+
 
         for item in self._item:
             item.draw()
@@ -185,5 +189,5 @@ class stage_controller():
             self.BOSS = True
 
         for item in self._item:
-            item.update(frame_time)
+            item.update(frame_time, pointXY)
 

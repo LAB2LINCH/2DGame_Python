@@ -26,14 +26,16 @@ class item():
         self.type = self.item_data[id][1]
         self.x = pointXY[0]
         self.y = pointXY[1]
+        self.sx = -100
 
     def hitbox(self):
-        return self.x - 25, self.y - 25, self.x + 25, self.y + 25
+        return self.sx - 25, self.y - 25, self.sx + 25, self.y + 25
 
     def draw(self):
-        self.image.draw(self.x, self.y)
+        self.image.draw(self.sx, self.y)
 
-    def update(self, frame_time):
+    def update(self, frame_time, pointXY):
+        self.sx = self.x - pointXY[0]
         self.y += self.spd * frame_time
         self.reverse_time -= frame_time
         if self.reverse_time <= 0:

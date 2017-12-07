@@ -150,14 +150,14 @@ class character():
         self.isground = False
 
     def hitbox(self, type): #idle, atk, skillc, skillv
-        if type == 0: return (self.x - 16, self.y - 18, self.x + 16, self. y + 18)
+        if type == 0: return (self.canvas_x - 16, self.y - 18, self.canvas_x + 16, self. y + 18)
         elif type == 1:
             if self.seeside == -1:
-               return (self.x  -32, self.y - 18, self.x -16, self.y + 18)
+               return (self.canvas_x  -32, self.y - 18, self.canvas_x -16, self.y + 18)
             else:
-               return (self.x + 16, self.y - 18, self.x + 32, self.y + 18)
-        elif type == 2: return (self.x - 50, self.y - 54, self.x + 50, self.y + 54)
-        elif type == 3: return (self.x - 240, self.y - 20, self.x + 240, self.y + 20)
+               return (self.canvas_x + 16, self.y - 18, self.canvas_x + 32, self.y + 18)
+        elif type == 2: return (self.canvas_x - 50, self.y - 54, self.canvas_x + 50, self.y + 54)
+        elif type == 3: return (self.canvas_x - 240, self.y - 20, self.canvas_x + 240, self.y + 20)
 
     def draw_hitbox(self):
         draw_rectangle(*self.hitbox(0))
@@ -213,7 +213,7 @@ class character():
         self.d_block = None
 
         self.image_char = load_image('./src/char.png')
-        self.x, self.y = 210, 800
+        self.x, self.y = 500, 800
         self.framesec = 0
         self.skillsec = 0
         self.c_skill_z = 0
@@ -279,7 +279,10 @@ class character():
             self.down_spd -= self.GRAVITY_P * frame_time
             self.y += self.down_spd * frame_time
 
+        self.x = clamp(0, self.x, 1600)
+
     def draw(self):
+        print(self.y)
         if self.state in (self.L_Z_SKILL, self.L_C_SKILL, self.L_X_SKILL, self.L_V_SKILL):
             self.image_char.clip_draw((self.frame*33), 108, 33, 36, self.canvas_x, self.y)
         elif self.state in (self.R_Z_SKILL, self.R_C_SKILL, self.R_X_SKILL, self.R_V_SKILL):

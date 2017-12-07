@@ -21,7 +21,8 @@ class env():
             './src/ground_1_G.png',
             './src/ground_1_S1.png',
             './src/ground_1_S2.png',
-            './src/ground_1_1.png'
+            './src/ground_1_1.png',
+            './src/ground_1_S3.png'
         ]
 
         self.image = load_image(env_data[type])
