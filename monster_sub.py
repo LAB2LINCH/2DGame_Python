@@ -43,6 +43,7 @@ class monster_sub():
         self.atktime = 0.5
         self.time = 0
         self.c_block = False
+        self.sx = self.x
 
         #see side left = -1, right = 1
         self.state = 0
@@ -82,18 +83,18 @@ class monster_sub():
 
     def draw(self):
         if self.type == 0:
-            self.monster_image.clip_draw(self.image_size_x//2 + (self.image_size_x//2 * self.seeside), 0, self.image_size_x, self.image_size_y, self.x, self.y)
+            self.monster_image.clip_draw(self.image_size_x//2 + (self.image_size_x//2 * self.seeside), 0, self.image_size_x, self.image_size_y, self.sx, self.y)
 
     def hitbox(self, type):
         if type == 0:
-            return (self.x - self.image_size_x//2, self.y - self.image_size_y//2, self. x + self.image_size_x//2, self.y
+            return (self.sx - self.image_size_x//2, self.y - self.image_size_y//2, self. sx + self.image_size_x//2, self.y
                     + self.image_size_y//2)
         if type == 1:
             if self.seeside == -1:
-                return (self.x - self.image_size_x, self.y - self.image_size_y//2, self.x - self.image_size_x//2, self.y
+                return (self.sx - self.image_size_x, self.y - self.image_size_y//2, self.sx - self.image_size_x//2, self.y
                         + self.image_size_y//2)
             else:
-                return (self.x + self.image_size_x//2, self.y - self.image_size_y//2, self.x + self.image_size_x, self.y
+                return (self.sx + self.image_size_x//2, self.y - self.image_size_y//2, self.sx + self.image_size_x, self.y
                         + self.image_size_y//2)
 
     def draw_hitbox(self):
@@ -101,6 +102,7 @@ class monster_sub():
 
     # state = i ready to atk, w wait to atktime
     def update(self, frame_time, pointXY):
+        self.sx = self.x-pointXY[0]
         if self.isground == False:
             self.down_spd -= self.GRAVITY_P * frame_time
             self.y += self.down_spd * frame_time

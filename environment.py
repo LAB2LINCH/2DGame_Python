@@ -29,9 +29,10 @@ class env():
 
         self.w = self.image.w
         self.h = self.image.h
+        self.sx = self.x
 
     def hitbox(self):
-        return ((self.x - (self.w//2)), (self.y - (self.h//2)), (self.x + (self.w//2)), (self.y + (self.h//2)))
+        return ((self.sx - (self.w//2)), (self.y - (self.h//2)), (self.sx + (self.w//2)), (self.y + (self.h//2)))
 
     def return_ground_y(self):
         return (self.y + (self.h//2))
@@ -40,4 +41,7 @@ class env():
         draw_rectangle(*self.hitbox())
 
     def draw(self):
-        self.image.draw(self.x, self.y)
+        self.image.draw(self.sx, self.y)
+
+    def update(self, pointX):
+        self.sx = self.x-pointX

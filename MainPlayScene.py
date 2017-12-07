@@ -49,7 +49,7 @@ def collision_ADD(a, b): #body = 0
 def enter():
     global Character, Map, Stage, running, Stage_ctrl
     Character = character.character(2)
-    Stage_ctrl = stage_controller.stage_controller(Stage)
+    Stage_ctrl = stage_controller.stage_controller(Stage, Character)
 
     Stage = 1
     running = True

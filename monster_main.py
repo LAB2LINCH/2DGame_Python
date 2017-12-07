@@ -65,6 +65,7 @@ class monster_main():
         self.actionspd = 1
         self.level = 1
         self.action_time = 1
+        self.sx = self.x
         '''
         if monster_main.sound_atk == None:
             monster_main.sound_atk = load_wav("./src/boss_sk.wav")
@@ -157,13 +158,13 @@ class monster_main():
 
     def hitbox(self, type):
         if type == self.BODY:
-            return (self.x - self.image_size_x//2, self.y - self.image_size_y//2, self. x + self.image_size_x//2, self.y)
+            return (self.sx - self.image_size_x//2, self.y - self.image_size_y//2, self.sx + self.image_size_x//2, self.y)
         elif type == self.NORMALATK:
-            return (self.x - self.image_size_x*3//4, self.y - self.image_size_y//2, self. x + self.image_size_x*3//4, self.y)
+            return (self.sx - self.image_size_x*3//4, self.y - self.image_size_y//2, self.sx + self.image_size_x*3//4, self.y)
         elif type == self.RANGEATK and self.seeside == -1:
-            return (self.x - self.image_size_x*3, self.y - self.image_size_y//3, self. x + self.image_size_x//2, self.y)
+            return (self.sx - self.image_size_x*3, self.y - self.image_size_y//3, self.sx + self.image_size_x//2, self.y)
         elif type == self.RANGEATK and self.seeside == 1:
-            return (self.x - self.image_size_x//2, self.y - self.image_size_y//3, self. x + self.image_size_x*3, self.y)
+            return (self.sx - self.image_size_x//2, self.y - self.image_size_y//3, self.sx + self.image_size_x*3, self.y)
 
     def draw(self):
         if self.monster_type == 1:
@@ -176,7 +177,7 @@ class monster_main():
                 x = (self.ATK * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
             else:
                 x = (self.state * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
-        self.monster_image.clip_draw((self.frame*self.image_size_x), x, self.image_size_x, self.image_size_y, self.x, self.y)
+        self.monster_image.clip_draw((self.frame*self.image_size_x), x, self.image_size_x, self.image_size_y, self.sx, self.y)
 
     def draw_hitbox(self):
         draw_rectangle(*self.hitbox(0))
@@ -184,6 +185,7 @@ class monster_main():
         draw_rectangle(*self.hitbox(2))
 
     def update(self, frame_time, pointXY): #state 0=walk, wait / 1 = atkwait, 2=atk, 3=pattern
+        self.sx = self.x-pointXY[0]
         self.framesec += self.FRAMES_PER_ACTION * self.ACTION_PER_TIME * frame_time
         self.frame = (int)(self.framesec) % self.how_many_frames
 
@@ -197,3 +199,4 @@ class monster_main():
             self.actionspd = 1
 
         self.stateset[self.state](self, frame_time, pointXY)
+

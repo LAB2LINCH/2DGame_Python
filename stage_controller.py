@@ -95,11 +95,12 @@ class stage_controller():
                 self._BLOCK.append(environment.env(e[0], (e[1], e[2])))
 
 
-    def __init__(self, stage):
+    def __init__(self, stage, character):
         self.stage = stage
         self.gametime = 0
         self.regen_time = 0
         self.stageChange(stage)
+        self.center_object = character
 
         self.item_drop_list = [[
             (0, 50),
@@ -113,12 +114,16 @@ class stage_controller():
         self.bgm = load_wav('./src/bgm.wav')
         self.bgm.repeat_play()
 
+        self.canvas_width = get_canvas_width()
+        self.canvas_height = get_canvas_height()
+        self.w = 2200
+
     def draw(self):
-        self._BGI.image.draw(self._BGI.x, self._BGI.y)
+        self._BGI.image.clip_draw_to_origin(self.window_left, 0, self.canvas_width, self.canvas_height, 0, 0)
         for e in self._BLOCK:
-            e.image.draw(e.x, e.y)
+            e.draw()
         for u in self._USEABLE:
-            u.image.draw(u.x, u.y)
+            u.draw()
         for monster in self.Monster:
             monster.draw()
 
@@ -159,6 +164,13 @@ class stage_controller():
 
 
     def update(self, frame_time, pointXY):
+        self.window_left = clamp(0, int(self.center_object.x) - self.canvas_width//2, self.w - self.canvas_width)
+
+        for e in self._BLOCK:
+            e.update(pointXY[0])
+        for u in self._USEABLE:
+            u.update(pointXY[0])
+
         self.Playtime += frame_time
         for monster in self.Monster:
             monster.update(frame_time, pointXY)

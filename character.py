@@ -182,7 +182,7 @@ class character():
         self.l_block = None
         self.r_block = None
         self.d_block = None
-        self.x, self.y = 210, 800
+        self.x, self.y = 0, 800
         self.framesec = 0
         self.skillsec = 0
         self.c_skill_z = 0
@@ -237,6 +237,7 @@ class character():
         self.ATK = False
         self.itemlist = []
         self.itemvalue = itemvalue
+        self.canvas_x = get_canvas_width()//2
         for i in range(itemvalue): # PASSIVE 아이템
             self.itemlist.append([i, 0])
 
@@ -280,11 +281,11 @@ class character():
 
     def draw(self):
         if self.state in (self.L_Z_SKILL, self.L_C_SKILL, self.L_X_SKILL, self.L_V_SKILL):
-            self.image_char.clip_draw((self.frame*33), 108, 33, 36, self.x, self.y)
+            self.image_char.clip_draw((self.frame*33), 108, 33, 36, self.canvas_x, self.y)
         elif self.state in (self.R_Z_SKILL, self.R_C_SKILL, self.R_X_SKILL, self.R_V_SKILL):
-            self.image_char.clip_draw((self.frame*33), 72, 33, 36, self.x, self.y)
+            self.image_char.clip_draw((self.frame*33), 72, 33, 36, self.canvas_x, self.y)
         else:
-            self.image_char.clip_draw((self.frame*33), (self.state * 36), 33, 36, self.x, self.y)
+            self.image_char.clip_draw((self.frame*33), (self.state * 36), 33, 36, self.canvas_x, self.y)
 
     def handle_events(self, frame_time, event):
         if((event.type == SDL_KEYDOWN) and (self.aniemelock)):
