@@ -110,6 +110,7 @@ class stage_controller():
         self.regen_time = 0
         self.stageChange(stage)
         self.center_object = character
+        self.boss_hp_percentage = 1
 
         self.item_drop_list = [[
             (0, 50),
@@ -122,6 +123,15 @@ class stage_controller():
         self.active_item = self.item_drop_list[self.ACTIVE]
         self.bgm = load_wav('./src/bgm.wav')
         self.bgm.repeat_play()
+
+        self.cooltime_check = self.center_object.skill_cooltime_check()
+
+        self._UI = load_image('./src/bgi_ui.png')
+        self._UI_skill_cooltime = load_image('./src/skill_cooltime.png')
+        self._UI_boss_hp = load_image('./src/boss_hp.png')
+
+        self.active_item_image = [load_image('./src/item_frizon.png'), load_image('./src/item_resetball.png')]
+        self.active_item_id = self.center_object.get_active_item_id() - len(self.passive_item)
 
         self.canvas_width = get_canvas_width()
         self.canvas_height = get_canvas_height()
@@ -136,6 +146,16 @@ class stage_controller():
         for monster in self.Monster:
             monster.draw()
 
+        self._UI.draw(800, 450)
+        if self.active_item_id >= 0:
+            self.active_item_image[self.active_item_id].draw(929, 192)
+        for i in range(5):
+            if self.cooltime_check[i] >= 0:
+                self._UI_skill_cooltime.draw(673+(64*i), 192)
+
+        if self.BOSS and self.BOSS_Alive:
+            self._UI_boss_hp.clip_draw_to_origin(0, 0, (int)(self._UI_boss_hp.w * self.boss_hp_percentage), self._UI_boss_hp.h, 5, 873,
+                                                 (int)(self._UI_boss_hp.w * self.boss_hp_percentage), self._UI_boss_hp.h)
 
         for e in self._BLOCK:
             e.draw_hitbox()
@@ -187,6 +207,12 @@ class stage_controller():
         for u in self._USEABLE:
             u.update(pointXY[0])
 
+        self.cooltime_check = self.center_object.skill_cooltime_check()
+        self.active_item_id = self.center_object.get_active_item_id() - len(self.passive_item)
+
+        if self.BOSS and self.BOSS_Alive:
+            self.boss_hp_percentage = self.BOSS_Monster.hp_percentage()
+
         self.Playtime += frame_time
         for monster in self.Monster:
             monster.update(frame_time, pointXY)
@@ -198,12 +224,15 @@ class stage_controller():
                 self.regen_time = 0
                 self.gen_count += 1
             if self.gen_count >= 1  and not self.BOSS:
-                self.Monster.append(monster_main.monster_main(self.stage * 300 - 100, self.regenpoint_b[1], self.stage-1))
+                self.BOSS_Monster = monster_main.monster_main(self.stage * 300 - 100, self.regenpoint_b[1],
+                                                              self.stage - 1)
+                self.Monster.append(self.BOSS_Monster)
                 self.BOSS = True
         elif self.stage == 3:
             if not self.BOSS and self.BOSS_Alive:
-                self.Monster.append(
-                    monster_main.monster_main(self.stage * 300 - 100, self.regenpoint_b[1], self.stage - 1))
+                self.BOSS_Monster = monster_main.monster_main(self.stage * 300 - 100, self.regenpoint_b[1],
+                                                                self.stage - 1)
+                self.Monster.append(self.BOSS_Monster)
                 self.BOSS = True
         for item in self._item:
             item.update(frame_time, pointXY)

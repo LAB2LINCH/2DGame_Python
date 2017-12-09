@@ -32,6 +32,12 @@ class character():
     PASSIVE, ACTIVE = 0, 1
     sound_skill_v = None
     sound_normal_atk = None
+    def get_active_item_id(self):
+        return self.itemlist[self.itemvalue-1][0]
+
+    def skill_cooltime_check(self):
+        return (1.5-self.c_skill_z, 0.5-self.c_skill_x, 3-self.c_skill_c, 5-self.c_skill_v,
+                self.itemlist[self.itemvalue-1][1]-self.item_cooldown)
 
     def handle_run(self, frame_time):
         if self.seeside == -1:
@@ -143,6 +149,7 @@ class character():
                 self.c_skill_x = 5
                 self.c_skill_c = 5
                 self.c_skill_v = 5
+            self.item_cooldown = 0
 
 
     handle_state = {

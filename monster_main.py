@@ -33,8 +33,12 @@ class monster_main():
     sound_atk = None
     sound_buf = None
 
+    def hp_percentage(self):
+        return self.hp / self.max_hp
+
     def __init__(self, hp, pointXY, monster_type):
         self.hp = hp
+        self.max_hp = hp
         self.x , self.y = pointXY
         self.nextatktime = 2.5
         self.atkdelay = 0.25 #frame
