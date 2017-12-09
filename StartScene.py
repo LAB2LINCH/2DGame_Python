@@ -34,7 +34,7 @@ def menu(input_key):#MENU 0 == start, 1 == exit
         select = (select + 1) % 2
     elif input_key == SPACE:
         if select == 0:
-            game_framework.push_state(MainPlayScene)
+            game_framework.change_state(MainPlayScene)
         else:
             game_framework.quit()
 

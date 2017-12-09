@@ -21,12 +21,21 @@ class env():
             './src/ground_1_G.png',
             './src/ground_1_S1.png',
             './src/ground_1_S2.png',
-            './src/ground_1_1.png',
-            './src/ground_1_S3.png'
+            './src/ground_1_S3.png',
+            './src/bgi_2.png',
+            './src/ground_2_G.png',
+            './src/ground_2_S1.png',
+            './src/ground_2_S2.png',
+            './src/ground_2_S3.png',
+            './src/bgi_3.png',
+            './src/ground_3_G.png',
+            './src/ground_3_S1.png',
+            './src/ground_3_S2.png',
+            './src/ground_3_S3.png'
         ]
 
         self.image = load_image(env_data[type])
-        #type 0=bg, 1=ground, 2=long, 3=short, 4=usealbe // stage*5 +
+        #type 0=bg, 1=ground, 2=long, 3=short, 4=block stage*5 +
 
         self.w = self.image.w
         self.h = self.image.h

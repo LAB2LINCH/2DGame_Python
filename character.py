@@ -40,7 +40,7 @@ class character():
         if self.seeside == 1:
             if not self.canmove[self.RIGHT]:
                 return
-        self.x += (self.RUN_SPEED_PPS * self.seeside * frame_time)
+        self.x = clamp(20, self.x+ (self.RUN_SPEED_PPS * self.seeside * frame_time), 1580)
 
     def handle_idle(self, frame_time):
         pass
@@ -76,7 +76,7 @@ class character():
                 self.aniemelock = False
                 self.change_state()
         elif self.c_skill_z >= 1.5:
-            self.x += self.RUN_SPEED_PPS * self.seeside * 0.5
+            self.x = clamp(2, self.x +self.RUN_SPEED_PPS * self.seeside * 0.5, 1580)
             self.ATK = True
             self.c_skill_z = 0
             self.aniemelock = True
@@ -132,6 +132,19 @@ class character():
         else:
             self.change_state()
 
+    def use_active_item(self):
+        if self.itemlist[self.itemvalue-1][0] == 0:
+            return
+        if self.item_cooldown >= self.itemlist[self.itemvalue-1][1]:
+            if self.itemlist[self.itemvalue-1][0] == 2:
+                self.immortal = True
+            if self.itemlist[self.itemvalue-1][0] == 3:
+                self.c_skill_z = 5
+                self.c_skill_x = 5
+                self.c_skill_c = 5
+                self.c_skill_v = 5
+
+
     handle_state = {
         RIGHT_RUN: handle_run,
         LEFT_RUN: handle_run,
@@ -148,6 +161,12 @@ class character():
     }
     def down(self):
         self.isground = False
+
+    def hit(self):
+        if self.immortal:
+            return False
+        else:
+            return True
 
     def hitbox(self, type): #idle, atk, skillc, skillv
         if type == 0: return (self.canvas_x - 16, self.y - 18, self.canvas_x + 16, self. y + 18)
@@ -197,6 +216,9 @@ class character():
         self.leftinput = False
         self.rightinput = False
         self.ATK = False
+        self.item_cooldown = 0
+        self.immortal = False
+        self.immortal_time = 0
 
 
     def __init__(self, itemvalue):
@@ -214,6 +236,7 @@ class character():
 
         self.image_char = load_image('./src/char.png')
         self.x, self.y = 500, 800
+        self.item_cooldown = 0
         self.framesec = 0
         self.skillsec = 0
         self.c_skill_z = 0
@@ -223,7 +246,7 @@ class character():
         self.t_skill_z = 0.25
         self.t_skill_x = 1/15
         self.t_skill_c = 0.25
-        self.t_skill_v = 2
+        self.t_skill_v = 0.5
         self._damage = 10
         self.atk_count = 0
         self.atk_count2 = 0
@@ -238,8 +261,11 @@ class character():
         self.itemlist = []
         self.itemvalue = itemvalue
         self.canvas_x = get_canvas_width()//2
+        self.immortal = False
+        self.immortal_time = 0
         for i in range(itemvalue): # PASSIVE 아이템
             self.itemlist.append([i, 0])
+        self.itemlist[itemvalue-1][0] = 0
 
         if character.sound_skill_v == None:
             character.sound_skill_v = load_wav('./src/earth_skill.wav')
@@ -261,7 +287,8 @@ class character():
             elif item.part == item.CRIT:
                 self.critchance += item.value
         else:
-            self.itemlist[self.itemvalue][0] = item.id
+            self.itemlist[self.itemvalue-1][0] = item.id
+            self.itemlist[self.itemvalue-1][1] = item.value
 
     def cooldown(self, frame_time):
         self.c_skill_z += frame_time
@@ -270,6 +297,12 @@ class character():
         self.c_skill_v += frame_time
 
     def update(self, frame_time):
+        self.item_cooldown += frame_time
+        if self.immortal:
+            self.immortal_time += frame_time
+            if self.immortal_time >= 1.5:
+                self.immortal = False
+                self.immortal_time = 0
         self.cooldown(frame_time)
         #if self.state <= 3:
         self.handle_state[self.state](self, frame_time)
@@ -279,10 +312,8 @@ class character():
             self.down_spd -= self.GRAVITY_P * frame_time
             self.y += self.down_spd * frame_time
 
-        self.x = clamp(0, self.x, 1600)
 
     def draw(self):
-        print(self.y)
         if self.state in (self.L_Z_SKILL, self.L_C_SKILL, self.L_X_SKILL, self.L_V_SKILL):
             self.image_char.clip_draw((self.frame*33), 108, 33, 36, self.canvas_x, self.y)
         elif self.state in (self.R_Z_SKILL, self.R_C_SKILL, self.R_X_SKILL, self.R_V_SKILL):
@@ -298,6 +329,8 @@ class character():
             elif event.key == SDLK_RIGHT:
                 self.seeside = 1
                 self.rightinput = True
+            elif event.key == SDLK_g:
+                self.use_active_item()
         elif((event.type == SDL_KEYUP) and (self.aniemelock)):
             if event.key == SDLK_LEFT:
                 self.leftinput = False
@@ -348,6 +381,8 @@ class character():
             elif event.key == SDLK_DOWN:
                 if self.y >= 300:
                     self.down()
+            elif event.key == SDLK_g:
+                self.use_active_item()
         elif ((event.type == SDL_KEYUP) and not(self.aniemelock)):
             if event.key == SDLK_LEFT:
                 self.leftinput = False

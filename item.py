@@ -12,7 +12,7 @@ class item():
             self.item_data = [
                 ("sword", self.PASSIVE, self.ATKPOWER, 2, './src/item_sword.png'),
                 ("glasses", self.PASSIVE, self.CRIT, 5, './src/item_glasses.png'),
-                ("frizon", self.ACTIVE, self.TIMESTOP, 3, './src/item_frizon.png'),
+                ("frizon", self.ACTIVE, self.TIMESTOP, 4, './src/item_frizon.png'),
                 ("resetball", self.ACTIVE, self.COOLTIME, 1.5, './src/item_resetball.png')
             ]
 

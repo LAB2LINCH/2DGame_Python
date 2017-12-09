@@ -28,6 +28,7 @@ class stage_controller():
         self.BOSS = False
         self.BOSS_Alive = True
         self.gen_count = 0
+        self.regen_time = 0
 
         '''
         stage_data_file = open('./TXT/stage_data.txt', 'r')
@@ -48,52 +49,56 @@ class stage_controller():
             (3, 1470, 540),
             (3, 2080, 540),
             (3, 2180, 350),
-            (5, 650, 450),
-            (5, 2550, 450),
+            (4, 400, 450),
+            (4, 2800, 450),
              (1, 1600, 75)],
-            [(0, 800, 450),
-            (2, 400, 300),
-            (3, 140, 340),
-            (3, 680, 340),
-            (2, 1050, 390),
-            (3, 1330, 430),
-            (3, 900, 550),
-            (2, 670, 675),
-            (5, 0, 450),
-             (1, 1600, 75)],
-            [(0, 800, 450),
-            (2, 400, 300),
-            (3, 140, 340),
-            (3, 680, 340),
-            (2, 1050, 390),
-            (3, 1330, 430),
-            (3, 900, 550),
-            (2, 670, 675),
-            (5, 0, 450),
-             (1, 1600, 75)],
+            [(5, 1600, 450),
+             (7, 800, 290),
+             (7, 1200, 480),
+             (7, 1880, 290),
+             (7, 1770, 670),
+             (8, 1470, 540),
+             (8, 2080, 540),
+             (8, 2180, 350),
+             (9, 400, 450),
+             (9, 2800, 450),
+             (6, 1600, 75)],
+            [(10, 1600, 450),
+             (12, 800, 290),
+             (12, 1200, 480),
+             (12, 1880, 290),
+             (12, 1770, 670),
+             (13, 1470, 540),
+             (13, 2080, 540),
+             (13, 2180, 350),
+             (14, 400, 450),
+             (14, 2800, 450),
+             (11, 1600, 75)],
         ]
 
         regen_data = [
-            {"NORMAL":[(800,171), (1300,171), (600,369), (900,719), (1200,459)],
-             "BOSS":[(800, 284), (1300, 284)]},
-            {"NORMAL": [(800, 171), (1300, 171), (600, 369), (900, 719), (1200, 459)],
-             "BOSS": [(800, 284), (1300, 284)]},
-            {"NORMAL": [(800, 171), (1300, 171), (600, 369), (900, 719), (1200, 459)],
-             "BOSS": [(800, 284), (1300, 284)]}
+            {"NORMAL":[(1100, 530), (1350, 200), (1870, 720), (1920, 340), (2180, 200)],
+             "BOSS":[(1350, 200), (2180, 200)]},
+            {"NORMAL": [(1100, 530), (1350, 200), (1870, 720), (1920, 340), (2180, 200)],
+             "BOSS": [(1350, 200), (2180, 200)] },
+            {"NORMAL": [(1100, 530), (1350, 200), (1870, 720), (1920, 340), (2180, 200)],
+             "BOSS": [(1350, 200), (2180, 200)]},
         ]
 
         self.env = stage_data[self.stage-1]
         self.regenpoint = regen_data[self.stage-1]['NORMAL']
         self.regenpoint_b = regen_data[self.stage-1]['BOSS']
 
+        self.Monster = []
         self._BGI = None
         self._BLOCK = []
         self._USEABLE = []
+        self._item = []
 
         for e in self.env:
-            if e[0] == self.BGI:
+            if e[0]%5 == self.BGI:
                 self._BGI = environment.env(e[0], (e[1], e[2]))
-            elif e[0] == self.USEABLE:
+            elif e[0]%5 == self.USEABLE:
                 self._USEABLE.append(environment.env(e[0], (e[1], e[2])))
             else:
                 self._BLOCK.append(environment.env(e[0], (e[1], e[2])))
@@ -143,17 +148,22 @@ class stage_controller():
         for item in self._item:
             item.draw()
 
+    def stage_check(self):
+        if len(self.Monster)+len(self._item) <= 0 and not self.BOSS_Alive:
+            return True
+        return False
+
     def drop_item(self, level, pointXY):
         value = randrange(1,100)
         if level == 0:
-            if True: # randrange(1,20) <= 1
+            if randrange(1,20) <= 1:
                 i=0
                 while value >= self.passive_item[i][1]:
                     i+=1
                     value -= self.passive_item[i][1]
                 self._item.append(item.item(i, pointXY))
         elif level == 1:
-            if randrange(1,10) <= 9:
+            if randrange(1,10) <= 5:
                 i=0
                 while value >= self.passive_item[i][1]:
                     i+=1
@@ -164,8 +174,10 @@ class stage_controller():
                 while value >= self.active_item[i][1]:
                     i+=1
                     value -= self.active_item[i][1]
-                self._item.append(item.item(i+self.passive_item.len-1, pointXY))#패시브아이템 개수 -1
+                self._item.append(item.item(i+len(self.passive_item), pointXY))#패시브아이템 개수 -1
 
+    def drop_item_test(self, type):
+        self._item.append(item.item(type, (1000, 350)))
 
     def update(self, frame_time, pointXY):
         self.window_left = clamp(0, int(self.center_object.x) - self.canvas_width//2, self.w - self.canvas_width)
@@ -180,14 +192,19 @@ class stage_controller():
             monster.update(frame_time, pointXY)
         self.gametime += frame_time
         self.regen_time += frame_time
-        if self.regen_time >= self._Regen_time and self.BOSS_Alive:
-            self.Monster.append(monster_sub.monster_sub(20, self.regenpoint[randint(0, 4)], self.stage-1))
-            self.regen_time = 0
-            self.gen_count += 1
-        if self.gen_count >= 1  and not self.BOSS:
-            self.Monster.append(monster_main.monster_main(200, self.regenpoint_b[1], self.stage-1))
-            self.BOSS = True
-
+        if self.stage < 3:
+            if self.regen_time >= self._Regen_time and self.BOSS_Alive:
+                self.Monster.append(monster_sub.monster_sub(self.stage * 30 - 10, self.regenpoint[randint(0, 4)], self.stage-1))
+                self.regen_time = 0
+                self.gen_count += 1
+            if self.gen_count >= 1  and not self.BOSS:
+                self.Monster.append(monster_main.monster_main(self.stage * 300 - 100, self.regenpoint_b[1], self.stage-1))
+                self.BOSS = True
+        elif self.stage == 3:
+            if not self.BOSS and self.BOSS_Alive:
+                self.Monster.append(
+                    monster_main.monster_main(self.stage * 300 - 100, self.regenpoint_b[1], self.stage - 1))
+                self.BOSS = True
         for item in self._item:
             item.update(frame_time, pointXY)
 

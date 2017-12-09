@@ -62,7 +62,6 @@ def update(frame_time):
 
 def draw(frame_time):
         clear_canvas()
-        MainPlayScene.draw(frame_time)
         bgi.draw(800, 450)
         select_arrow.draw(672, 450-(select*78))
         update_canvas()

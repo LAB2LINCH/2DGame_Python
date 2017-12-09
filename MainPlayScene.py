@@ -47,12 +47,12 @@ def collision_ADD(a, b): #body = 0
 
 
 def enter():
-    global Character, Map, Stage, running, Stage_ctrl
-    Character = character.character(2)
-    Stage_ctrl = stage_controller.stage_controller(Stage, Character)
-
+    global Character, Stage, running, Stage_ctrl
     Stage = 1
     running = True
+
+    Character = character.character(2)
+    Stage_ctrl = stage_controller.stage_controller(Stage, Character)
 
 def exit():
     pass
@@ -70,46 +70,70 @@ def handle_events(frame_time):
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.push_state(MenuScene)
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p):
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
+            Stage_ctrl.stageChange(1)
+            Character.stage_Change()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
             Stage_ctrl.stageChange(2)
             Character.stage_Change()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
+            Stage_ctrl.stageChange(3)
+            Character.stage_Change()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
+            Stage_ctrl.drop_item_test(0)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
+            Stage_ctrl.drop_item_test(1)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_6):
+            Stage_ctrl.drop_item_test(2)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_7):
+            Stage_ctrl.drop_item_test(3)
         else:
             Character.handle_events(frame_time, event)
 
 def update(frame_time):
-    global Character, running, Stage_ctrl, groundcheck
+    global Character, running, Stage_ctrl, groundcheck, Stage
     Character.update(frame_time)
     Stage_ctrl.update(frame_time, (Character.x, Character.y))
+
+    if Stage_ctrl.stage_check():
+        if Stage < 3:
+            Stage += 1
+            Stage_ctrl.stageChange(Stage)
+        else :
+            print('clear')
 
     for monster in Stage_ctrl.Monster:
         if (monster.state == monster.ATK):
             if (collision(Character.hitbox(0), monster.hitbox(1))):#char - mon_atk
-                print("AAAAAA")
+                if Character.hit():
+                    game_framework.change_state(GameOverScene)
         elif monster.level == 0:
             if monster.state == monster.SKILL1:#char - mon_skill
                 pass
-
         if (Character.state // 2) == 3:  # mon - char_atk
             if (collision(Character.hitbox(1), monster.hitbox(0))):
-                print(monster.hp)
                 if Character.ATK:
                     if(monster.damage(Character.damage()//2)):
                         Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
+                        if monster.level == 1:
+                            Stage_ctrl.BOSS_Alive = False
                         Stage_ctrl.Monster.remove(monster)
         elif (Character.state // 2) == 4:  # mon - char_skill1
             if (collision(Character.hitbox(2), monster.hitbox(0))):
-                print(monster.hp)
                 if Character.ATK:
                     if(monster.damage(Character.damage()*3)):
                         Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
+                        if monster.level == 1:
+                            Stage_ctrl.BOSS_Alive = False
                         Stage_ctrl.Monster.remove(monster)
                         Character.ATK = False
         elif (Character.state // 2) == 5:  # mon - char_skill2
             if (collision(Character.hitbox(3), monster.hitbox(0))):
-                print(monster.hp)
                 if Character.ATK:
                     if(monster.damage(Character.damage())):
                         Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
+                        if monster.level == 1:
+                            Stage_ctrl.BOSS_Alive = False
                         Stage_ctrl.Monster.remove(monster)
     Character.ATK = False
 
