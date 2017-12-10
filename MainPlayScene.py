@@ -218,6 +218,4 @@ def draw(frame_time):
     Stage_ctrl.draw()
     Character.draw()
 
-    Character.draw_hitbox()
-
     update_canvas()
