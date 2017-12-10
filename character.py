@@ -32,6 +32,13 @@ class character():
     PASSIVE, ACTIVE = 0, 1
     sound_skill_v = None
     sound_normal_atk = None
+
+    def pause(self):
+        self.keydown = 0
+        self.leftinput = False
+        self.rightinput = False
+        self.change_state()
+
     def get_active_item_id(self):
         return self.itemlist[self.itemvalue-1][0]
 
@@ -296,6 +303,7 @@ class character():
         else:
             self.itemlist[self.itemvalue-1][0] = item.id
             self.itemlist[self.itemvalue-1][1] = item.value
+            self.item_cooldown = 0
 
     def cooldown(self, frame_time):
         self.c_skill_z += frame_time

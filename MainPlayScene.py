@@ -56,13 +56,17 @@ def enter():
     Stage_ctrl = stage_controller.stage_controller(Stage, Character)
 
 def exit():
+    global Character, Stage_ctrl
     del(Stage_ctrl.bgm)
     pass
 
 def pause():
+    global Character, Stage_ctrl
+    Character.pause()
     Stage_ctrl.bgm.pause()
 
 def resume():
+    global Stage_ctrl
     Stage_ctrl.bgm.resume()
 
 def handle_events(frame_time):
@@ -86,9 +90,11 @@ def handle_events(frame_time):
             Stage_ctrl.stageChange(3)
             Character.stage_Change()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
-            Stage_ctrl.drop_item_test(0)
+            for i in range(50):
+                Stage_ctrl.drop_item_test(0)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
-            Stage_ctrl.drop_item_test(1)
+            for i in range(50):
+                Stage_ctrl.drop_item_test(1)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_6):
             Stage_ctrl.drop_item_test(2)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_7):
@@ -100,13 +106,6 @@ def update(frame_time):
     global Character, running, Stage_ctrl, groundcheck, Stage
     Character.update(frame_time)
     Stage_ctrl.update(frame_time, (Character.x, Character.y))
-
-    if Stage_ctrl.stage_check():
-        if Stage < 3:
-            Stage += 1
-            Stage_ctrl.stageChange(Stage)
-        else :
-            game_framework.change_state(ClearScene)
 
     for monster in Stage_ctrl.Monster:
         if (monster.state == monster.ATK):
@@ -210,6 +209,13 @@ def update(frame_time):
         if (collision(Character.hitbox(0), item.hitbox())):
             Character.getitem(item)
             Stage_ctrl._item.remove(item)
+
+    if Stage_ctrl.stage_check():
+        if Stage < 3:
+            Stage += 1
+            Stage_ctrl.stageChange(Stage)
+        else :
+            game_framework.change_state(ClearScene)
 
 def draw(frame_time):
     global Character
