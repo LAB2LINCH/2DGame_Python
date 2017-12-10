@@ -19,10 +19,6 @@ class stage_controller():
     _Regen_time = 3
     Playtime = 0
 
-
-    def stopbgm(self):
-        self.bgm.play()
-
     def stageChange(self, stage):
         self.stage = stage
         self.BOSS = False
@@ -64,13 +60,6 @@ class stage_controller():
              (9, 2800, 450),
              (6, 1600, 75)],
             [(10, 1600, 450),
-             (12, 800, 290),
-             (12, 1200, 480),
-             (12, 1880, 290),
-             (12, 1770, 670),
-             (13, 1470, 540),
-             (13, 2080, 540),
-             (13, 2180, 350),
              (14, 400, 450),
              (14, 2800, 450),
              (11, 1600, 75)],
@@ -94,6 +83,7 @@ class stage_controller():
         self._BLOCK = []
         self._USEABLE = []
         self._item = []
+        self.font = load_font('./src/ENCR10B.TTF')
 
         for e in self.env:
             if e[0]%5 == self.BGI:
@@ -105,6 +95,7 @@ class stage_controller():
 
 
     def __init__(self, stage, character):
+        self.timer = 0
         self.stage = stage
         self.gametime = 0
         self.regen_time = 0
@@ -121,7 +112,7 @@ class stage_controller():
         ]]
         self.passive_item = self.item_drop_list[self.PASSIVE]
         self.active_item = self.item_drop_list[self.ACTIVE]
-        self.bgm = load_wav('./src/bgm.wav')
+        self.bgm = load_music('./src/bgm.mp3')
         self.bgm.repeat_play()
 
         self.cooltime_check = self.center_object.skill_cooltime_check()
@@ -149,6 +140,8 @@ class stage_controller():
         self._UI.draw(800, 450)
         if self.active_item_id >= 0:
             self.active_item_image[self.active_item_id].draw(929, 192)
+        self.font.draw(1520, 846, "%d:%d:%d" % (self.timer/3600, (self.timer/60)%60, self.timer%60))
+
         for i in range(5):
             if self.cooltime_check[i] >= 0:
                 self._UI_skill_cooltime.draw(673+(64*i), 192)
@@ -156,14 +149,14 @@ class stage_controller():
         if self.BOSS and self.BOSS_Alive:
             self._UI_boss_hp.clip_draw_to_origin(0, 0, (int)(self._UI_boss_hp.w * self.boss_hp_percentage), self._UI_boss_hp.h, 5, 873,
                                                  (int)(self._UI_boss_hp.w * self.boss_hp_percentage), self._UI_boss_hp.h)
-
+        '''
         for e in self._BLOCK:
             e.draw_hitbox()
         for u in self._USEABLE:
             u.draw_hitbox()
         for monster in self.Monster:
             monster.draw_hitbox()
-
+        '''
 
         for item in self._item:
             item.draw()
@@ -201,6 +194,7 @@ class stage_controller():
 
     def update(self, frame_time, pointXY):
         self.window_left = clamp(0, int(self.center_object.x) - self.canvas_width//2, self.w - self.canvas_width)
+        self.timer += frame_time
 
         for e in self._BLOCK:
             e.update(pointXY[0])

@@ -4,6 +4,7 @@ import game_framework
 import GameOverScene
 import character
 import stage_controller
+import ClearScene
 import MenuScene
 
 
@@ -55,15 +56,17 @@ def enter():
     Stage_ctrl = stage_controller.stage_controller(Stage, Character)
 
 def exit():
+    del(Stage_ctrl.bgm)
     pass
 
 def pause():
-    pass
+    Stage_ctrl.bgm.pause()
 
 def resume():
-    pass
+    Stage_ctrl.bgm.resume()
 
 def handle_events(frame_time):
+    global Stage
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -71,12 +74,15 @@ def handle_events(frame_time):
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.push_state(MenuScene)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
+            Stage = 1
             Stage_ctrl.stageChange(1)
             Character.stage_Change()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
+            Stage = 2
             Stage_ctrl.stageChange(2)
             Character.stage_Change()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
+            Stage = 3
             Stage_ctrl.stageChange(3)
             Character.stage_Change()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
@@ -100,7 +106,7 @@ def update(frame_time):
             Stage += 1
             Stage_ctrl.stageChange(Stage)
         else :
-            print('clear')
+            game_framework.change_state(ClearScene)
 
     for monster in Stage_ctrl.Monster:
         if (monster.state == monster.ATK):

@@ -29,6 +29,9 @@ class monster_sub():
 
     sound_die = None
     sound_atk = None
+    font = None
+    hp_bar = None
+    hp_bar_back = None
 
     monster_sub_data = [
         (48, 52, './src/mon_sub1.png'),
@@ -63,12 +66,22 @@ class monster_sub():
         self.image_size_x = self.monster_sub_data[monster_type][self.XSIZE]
         self.image_size_y = self.monster_sub_data[monster_type][self.YSIZE]
         self.monster_image = load_image(self.monster_sub_data[monster_type][self.ROOT])
+        if monster_sub.hp_bar_back == None:
+            monster_sub.hp_bar_back = load_image('./src/mon_hp_bar.png')
+        if monster_sub.hp_bar == None:
+            monster_sub.hp_bar = load_image('./src/mon_hp.png')
+        if monster_sub.font == None:
+            monster_sub.font = load_font('./src/ENCR10B.TTF')
         if monster_sub.sound_die == None:
             monster_sub.sound_die = load_wav("./src/mon_die.wav")
             monster_sub.sound_die.set_volume(100)
         if monster_sub.sound_atk == None:
             monster_sub.sound_atk = load_wav("./src/mon_atk.wav")
             monster_sub.sound_atk.set_volume(100)
+        self.damaged = 0
+        self.damaged_show_time = 1.5
+        self.hp_percentage = 1.0
+        self.max_hp = hp
 
     def damage(self, x):
         self.hp -= x
@@ -84,6 +97,9 @@ class monster_sub():
     def draw(self):
         if self.type == 0:
             self.monster_image.clip_draw(self.image_size_x//2 + (self.image_size_x//2 * self.seeside), 0, self.image_size_x, self.image_size_y, self.sx, self.y)
+        self.hp_bar_back.draw(self.sx, self.y + 60)
+        self.hp_bar.clip_draw_to_origin(0, 0, (int)(self.hp_bar.w * self.hp_percentage), self.hp_bar.h, self.sx-46, self.y+52,
+                                                (int)(self.hp_bar.w * self.hp_percentage), self.hp_bar.h)
 
     def hitbox(self, type):
         if type == 0:
@@ -106,6 +122,7 @@ class monster_sub():
         if self.isground == False:
             self.down_spd -= self.GRAVITY_P * frame_time
             self.y += self.down_spd * frame_time
+        self.hp_percentage = self.hp / self.max_hp
 
         if self.state == self.IDLE:
             if ((math.fabs(pointXY[1] - self.y) <= 120) and (math.fabs(800 - self.sx) <= 500)):

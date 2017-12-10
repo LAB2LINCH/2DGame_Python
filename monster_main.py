@@ -70,14 +70,14 @@ class monster_main():
         self.level = 1
         self.action_time = 1
         self.sx = -100
-        '''
+
         if monster_main.sound_atk == None:
-            monster_main.sound_atk = load_wav("./src/boss_sk.wav")
+            monster_main.sound_atk = load_wav("./src/boss_at.wav")
             monster_main.sound_atk.set_volume(32)
         if monster_main.sound_buf == None:
             monster_main.sound_buf = load_wav("./src/boss_sk.wav")
             monster_main.sound_buf.set_volume(32)
-        '''
+
         self.is_sound_on = True
 
     def onground(self, y):
@@ -125,7 +125,7 @@ class monster_main():
     def atk(self, frame_time, pointXY):
         self.framesec2 += frame_time
         if self.is_sound_on:
-            #monster_main.sound_atk.play()
+            monster_main.sound_atk.play()
             self.is_sound_on = False
         if self.framesec2 >= (self.action_time / self.actionspd):
             self.framesec2 = 0
@@ -142,12 +142,16 @@ class monster_main():
             self.state = self.IDLE
             self.is_sound_on = True
         if self.is_sound_on:
-            #monster_main.sound_atk.play()
+            monster_main.sound_buf.play()
             self.is_sound_on = False
 
     def skill2(self, frame_time, pointXY):
         self.framesec2 += frame_time
+        if self.is_sound_on:
+            monster_main.sound_atk.play()
+            self.is_sound_on = False
         if self.framesec2 >= (self.action_time*2 / self.actionspd):
+            self.is_sound_on = True
             self.framesec2 = 0
             self.state = self.IDLE
 
