@@ -99,6 +99,8 @@ def handle_events(frame_time):
             Stage_ctrl.drop_item_test(2)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_7):
             Stage_ctrl.drop_item_test(3)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_8):
+            Stage_ctrl.monster_gen()
         else:
             Character.handle_events(frame_time, event)
 
@@ -118,7 +120,7 @@ def update(frame_time):
         if (Character.state // 2) == 3:  # mon - char_atk
             if (collision(Character.hitbox(1), monster.hitbox(0))):
                 if Character.ATK:
-                    if(monster.damage(Character.damage()//2)):
+                    if(monster.damage(Character.damage((monster.sx, monster.y))//2)):
                         Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
                         if monster.level == 1:
                             Stage_ctrl.BOSS_Alive = False
@@ -126,7 +128,7 @@ def update(frame_time):
         elif (Character.state // 2) == 4:  # mon - char_skill1
             if (collision(Character.hitbox(2), monster.hitbox(0))):
                 if Character.ATK:
-                    if(monster.damage(Character.damage()*3)):
+                    if(monster.damage(Character.damage((monster.sx, monster.y))*3)):
                         Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
                         if monster.level == 1:
                             Stage_ctrl.BOSS_Alive = False
@@ -135,7 +137,7 @@ def update(frame_time):
         elif (Character.state // 2) == 5:  # mon - char_skill2
             if (collision(Character.hitbox(3), monster.hitbox(0))):
                 if Character.ATK:
-                    if(monster.damage(Character.damage())):
+                    if(monster.damage(Character.damage((monster.sx, monster.y)))):
                         Stage_ctrl.drop_item(monster.level, (monster.x, monster.y))
                         if monster.level == 1:
                             Stage_ctrl.BOSS_Alive = False
@@ -214,6 +216,7 @@ def update(frame_time):
         if Stage < 3:
             Stage += 1
             Stage_ctrl.stageChange(Stage)
+            Character.stage_Change()
         else :
             game_framework.change_state(ClearScene)
 

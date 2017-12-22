@@ -32,6 +32,8 @@ class monster_sub():
     font = None
     hp_bar = None
     hp_bar_back = None
+    image = None
+    monster_type = None
 
     monster_sub_data = [
         (48, 52, './src/mon_sub1.png'),
@@ -40,7 +42,7 @@ class monster_sub():
 
     def __init__(self, hp, pointXY, monster_type):
         self.hp = hp
-        self.x , self.y = pointXY
+        self.x , self.y = (pointXY[0] -50 + random.randrange(100)), (pointXY[1] -50 + random.randrange(100))
         self.nextatktime = 2.5
         self.atkdelay = 0.25 #frame
         self.atktime = 0.5
@@ -65,7 +67,10 @@ class monster_sub():
         self.sleeptime = random.randint(5,15) / 10
         self.image_size_x = self.monster_sub_data[monster_type][self.XSIZE]
         self.image_size_y = self.monster_sub_data[monster_type][self.YSIZE]
-        self.monster_image = load_image(self.monster_sub_data[monster_type][self.ROOT])
+        if monster_sub.monster_type != monster_type:
+            monster_sub.monster_type = monster_type
+            monster_sub.image = load_image(self.monster_sub_data[monster_type][self.ROOT])
+        #self.monster_image = load_image(self.monster_sub_data[monster_type][self.ROOT])
         if monster_sub.hp_bar_back == None:
             monster_sub.hp_bar_back = load_image('./src/mon_hp_bar.png')
         if monster_sub.hp_bar == None:
@@ -96,7 +101,7 @@ class monster_sub():
 
     def draw(self):
         if self.type == 0:
-            self.monster_image.clip_draw(self.image_size_x//2 + (self.image_size_x//2 * self.seeside), 0, self.image_size_x, self.image_size_y, self.sx, self.y)
+            monster_sub.image.clip_draw(self.image_size_x//2 + (self.image_size_x//2 * self.seeside), 0, self.image_size_x, self.image_size_y, self.sx, self.y)
         self.hp_bar_back.draw(self.sx, self.y + 60)
         self.hp_bar.clip_draw_to_origin(0, 0, (int)(self.hp_bar.w * self.hp_percentage), self.hp_bar.h, self.sx-46, self.y+52,
                                                 (int)(self.hp_bar.w * self.hp_percentage), self.hp_bar.h)

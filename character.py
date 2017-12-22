@@ -18,6 +18,8 @@ class character():
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 8
 
+
+
     JUMP_START = ((JUMP_HEIGHT_P * 2) / (JUMP_TIME / 2))
 
     GRAVITY_P = (JUMP_START / (JUMP_TIME / 2))
@@ -32,6 +34,8 @@ class character():
     PASSIVE, ACTIVE = 0, 1
     sound_skill_v = None
     sound_normal_atk = None
+    sound_skill_z = None
+    sound_jump = None
 
     def pause(self):
         self.keydown = 0
@@ -53,13 +57,15 @@ class character():
         if self.seeside == 1:
             if not self.canmove[self.RIGHT]:
                 return
-        self.x = clamp(20, self.x+ (self.RUN_SPEED_PPS * self.seeside * frame_time), 1580)
+        self.x = clamp(20, self.x + (self.RUN_SPEED_PPS * self.seeside * frame_time), 1580)
+        self.skill_x -= (self.RUN_SPEED_PPS * self.seeside * frame_time)
 
     def handle_idle(self, frame_time):
         pass
 
     def handle_jump(self, frame_time):
         self.down_spd = self.JUMP_START
+        character.sound_jump.play()
         self.isground = False
         self.y += 3
 
@@ -90,6 +96,8 @@ class character():
                 self.change_state()
         elif self.c_skill_z >= 1.5:
             self.x = clamp(2, self.x +self.RUN_SPEED_PPS * self.seeside * 0.5, 1580)
+            self.skill_x -= (self.RUN_SPEED_PPS * self.seeside * 0.5)
+            character.sound_skill_z.play()
             self.ATK = True
             self.c_skill_z = 0
             self.aniemelock = True
@@ -198,7 +206,14 @@ class character():
         draw_rectangle(*self.hitbox(2))
         draw_rectangle(*self.hitbox(3))
 
-    def damage(self):
+    def damage(self, pointXY):
+        self.skill_x, self.skill_y = pointXY
+        if self.state in (self.L_C_SKILL, self.R_C_SKILL):
+            self.anime_time = 0.5
+            self.anime_state = 1
+        elif self.state in (self.L_X_SKILL, self.R_X_SKILL):
+            self.anime_time = 0.5
+            self.anime_state = 0
         if(random.randrange(0,100) <= self.critchance):
             return (self._damage * 2)
         else:
@@ -215,9 +230,12 @@ class character():
         self.l_block = None
         self.r_block = None
         self.d_block = None
-        self.x, self.y = 0, 800
+        self.x, self.y = 800, 1000
         self.framesec = 0
         self.skillsec = 0
+        self.anime_time = 0
+        self.anime_state = 0
+        self.skill_x, self.skill_y = 0, 0
         self.c_skill_z = 0
         self.c_skill_x = 0
         self.c_skill_c = 0
@@ -249,7 +267,10 @@ class character():
         self.d_block = None
 
         self.image_char = load_image('./src/char.png')
-        self.x, self.y = 500, 800
+        self.image_skill_x = load_image('./src/char_atk.png')
+        self.image_skill_c = load_image('./src/char_skill_c.png')
+        self.image_skill_v = load_image('./src/char_skill_v.png')
+        self.x, self.y = 800, 1000
         self.item_cooldown = 0
         self.framesec = 0
         self.skillsec = 0
@@ -261,6 +282,9 @@ class character():
         self.t_skill_x = 1/15
         self.t_skill_c = 0.25
         self.t_skill_v = 0.5
+        self.anime_time = 0
+        self.anime_state = 0
+        self.skill_x, self.skill_y = 0, 0
         self._damage = 10
         self.atk_count = 0
         self.atk_count2 = 0
@@ -281,6 +305,12 @@ class character():
             self.itemlist.append([i, 0])
         self.itemlist[itemvalue-1][0] = 0
 
+        if character.sound_skill_z == None:
+            character.sound_skill_z = load_wav('./src/char_blink.wav')
+            character.sound_skill_z.set_volume(50)
+        if character.sound_jump == None:
+            character.sound_jump = load_wav('./src/char_jump.wav')
+            character.sound_jump.set_volume(50)
         if character.sound_skill_v == None:
             character.sound_skill_v = load_wav('./src/earth_skill.wav')
             character.sound_skill_v.set_volume(100)
@@ -313,6 +343,8 @@ class character():
 
     def update(self, frame_time):
         self.item_cooldown += frame_time
+        if self.anime_time > 0:
+            self.anime_time -= frame_time
         if self.immortal:
             self.immortal_time += frame_time
             if self.immortal_time >= 1.5:
@@ -329,12 +361,22 @@ class character():
 
 
     def draw(self):
-        if self.state in (self.L_Z_SKILL, self.L_C_SKILL, self.L_X_SKILL, self.L_V_SKILL):
-            self.image_char.clip_draw((self.frame*33), 108, 33, 36, self.canvas_x, self.y)
-        elif self.state in (self.R_Z_SKILL, self.R_C_SKILL, self.R_X_SKILL, self.R_V_SKILL):
-            self.image_char.clip_draw((self.frame*33), 72, 33, 36, self.canvas_x, self.y)
-        else:
+        if self.anime_time > 0:
+            if self.anime_state == 0:
+                self.image_skill_x.clip_draw(0, (self.frame*36), 33, 36, self.skill_x, self.skill_y)
+            elif self.anime_state == 1:
+                self.image_skill_c.clip_draw(0, (self.frame*36), 33, 36, self.skill_x, self.skill_y)
+
+        if self.state in (self.LEFT_IDLE, self.LEFT_RUN, self.RIGHT_IDLE, self.RIGHT_RUN):
             self.image_char.clip_draw((self.frame*33), (self.state * 36), 33, 36, self.canvas_x, self.y)
+        elif self.state in (self.L_Z_SKILL, self.L_C_SKILL, self.L_X_SKILL):
+            self.image_char.clip_draw((self.frame*33), 180, 33, 36, self.canvas_x, self.y)
+        elif self.state in (self.R_Z_SKILL, self.R_C_SKILL, self.R_X_SKILL):
+            self.image_char.clip_draw((self.frame*33), 144, 33, 36, self.canvas_x, self.y)
+        elif self.state in (self.L_V_SKILL, self.R_V_SKILL):
+            self.image_char.clip_draw((self.frame * 33), 144+((self.state-10) * 36), 33, 36, self.canvas_x, self.y)
+            self.image_skill_v.clip_draw(0, (self.frame * 36), 240, 36, self.canvas_x, self.y)
+
 
     def handle_events(self, frame_time, event):
         if((event.type == SDL_KEYDOWN) and (self.aniemelock)):

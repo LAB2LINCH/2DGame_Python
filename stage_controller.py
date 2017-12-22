@@ -113,6 +113,7 @@ class stage_controller():
         self.passive_item = self.item_drop_list[self.PASSIVE]
         self.active_item = self.item_drop_list[self.ACTIVE]
         self.bgm = load_music('./src/bgm.mp3')
+        self.bgm.set_volume(50)
         self.bgm.repeat_play()
 
         self.cooltime_check = self.center_object.skill_cooltime_check()
@@ -140,7 +141,7 @@ class stage_controller():
         self._UI.draw(800, 450)
         if self.active_item_id >= 0:
             self.active_item_image[self.active_item_id].draw(929, 192)
-        self.font.draw(1520, 846, "%d:%d:%d" % (self.timer/3600, (self.timer/60)%60, self.timer%60))
+        self.font.draw(1520, 846, "%d:%d:%d" % (self.timer/3600, (self.timer/60)%60, self.timer%60), (255,255,255))
 
         for i in range(5):
             if self.cooltime_check[i] >= 0:
@@ -191,6 +192,9 @@ class stage_controller():
 
     def drop_item_test(self, type):
         self._item.append(item.item(type, (1000, 350)))
+
+    def monster_gen(self):
+        self.Monster.append(monster_sub.monster_sub(self.stage * 30 - 10, self.regenpoint[randint(0, 4)], self.stage - 1))
 
     def update(self, frame_time, pointXY):
         self.window_left = clamp(0, int(self.center_object.x) - self.canvas_width//2, self.w - self.canvas_width)
