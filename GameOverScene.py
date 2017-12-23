@@ -3,10 +3,14 @@ import StartScene
 from pico2d import *
 
 Image = None
+sound = None
 
 def enter():
-    global Image
+    global Image, sound
     Image = load_image("./src/bgi_game_over.png")
+    sound = load_wav("./src/game_over.wav")
+    sound.set_volume(50)
+    sound.play()
 
 def exit():
     pass

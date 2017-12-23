@@ -14,7 +14,7 @@ class monster_sub():
 
     TIME_PER_ACTION = 0.5
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-    FRAMES_PER_ACTION = 8
+    FRAMES_PER_ACTION = 3
 
     JUMP_START = ((JUMP_HEIGHT_P * 2) / (JUMP_TIME / 2))
 
@@ -55,12 +55,12 @@ class monster_sub():
         self.seeside = 1
         self.isground = True
         self.frame = 0
+        self.framesec = 0
         self.down_spd = 10
         self.canmove = [True, True]
         self.l_block = None
         self.r_block = None
         self.d_block = None
-        self.type = 0
         self.level = 0
         self.randomx = random.randint(0,10)
         self.runtime = 2.5
@@ -100,8 +100,16 @@ class monster_sub():
         self.y = (y + (self.image_size_y//2))
 
     def draw(self):
-        if self.type == 0:
-            monster_sub.image.clip_draw(self.image_size_x//2 + (self.image_size_x//2 * self.seeside), 0, self.image_size_x, self.image_size_y, self.sx, self.y)
+        if self.state in (self.IDLE, self.RUN, self.ATK):
+            monster_sub.image.clip_draw((self.image_size_x*self.frame),
+                                        (self.state * 2 * self.image_size_y) + (
+                                        self.image_size_y//2 + self.seeside * (self.image_size_y // 2)),
+                                        self.image_size_x, self.image_size_y, self.sx, self.y)
+        else :
+            monster_sub.image.clip_draw((self.image_size_x * self.frame),
+                                        (self.ATK * 2 * self.image_size_y) + (
+                                        self.image_size_y // 2 + self.seeside * (self.image_size_y // 2)),
+                                        self.image_size_x, self.image_size_y, self.sx, self.y)
         self.hp_bar_back.draw(self.sx, self.y + 60)
         self.hp_bar.clip_draw_to_origin(0, 0, (int)(self.hp_bar.w * self.hp_percentage), self.hp_bar.h, self.sx-46, self.y+52,
                                                 (int)(self.hp_bar.w * self.hp_percentage), self.hp_bar.h)
@@ -123,6 +131,8 @@ class monster_sub():
 
     # state = i ready to atk, w wait to atktime
     def update(self, frame_time, pointXY):
+        self.framesec += self.FRAMES_PER_ACTION * self.ACTION_PER_TIME * frame_time
+        self.frame = (int)(self.framesec % 3)
         self.sx = self.x-pointXY[0]
         if self.isground == False:
             self.down_spd -= self.GRAVITY_P * frame_time
@@ -131,17 +141,17 @@ class monster_sub():
 
         if self.state == self.IDLE:
             if ((math.fabs(pointXY[1] - self.y) <= 120) and (math.fabs(800 - self.sx) <= 500)):
-                if (800 - self.sx) >= 0 :
-                    self.seeside = 1
-                else:
+                if self.sx > 804 :
                     self.seeside = -1
+                elif self.sx < 796:
+                    self.seeside = 1
                 self.state = self.RUN
         elif self.state == self.RUN:
             self.time += frame_time
-            if (800 - self.sx) >= 0:
-                self.seeside = 1
-            else:
+            if self.sx > 804:
                 self.seeside = -1
+            elif self.sx < 796:
+                self.seeside = 1
             if self.time >= self.runtime:
                 self.time = 0
                 self.state = self.SLEEP

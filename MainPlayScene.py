@@ -90,11 +90,9 @@ def handle_events(frame_time):
             Stage_ctrl.stageChange(3)
             Character.stage_Change()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
-            for i in range(50):
-                Stage_ctrl.drop_item_test(0)
+            Stage_ctrl.drop_item_test(0)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
-            for i in range(50):
-                Stage_ctrl.drop_item_test(1)
+            Stage_ctrl.drop_item_test(1)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_6):
             Stage_ctrl.drop_item_test(2)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_7):
@@ -114,9 +112,11 @@ def update(frame_time):
             if (collision(Character.hitbox(0), monster.hitbox(1))):#char - mon_atk
                 if Character.hit():
                     game_framework.change_state(GameOverScene)
-        elif monster.level == 0:
-            if monster.state == monster.SKILL1:#char - mon_skill
-                pass
+        elif monster.level == 1:
+            if monster.state == monster.SKILL2:#char - mon_skill
+                if (collision(Character.hitbox(0), monster.hitbox(2))):
+                    if Character.hit():
+                        game_framework.change_state(GameOverScene)
         if (Character.state // 2) == 3:  # mon - char_atk
             if (collision(Character.hitbox(1), monster.hitbox(0))):
                 if Character.ATK:

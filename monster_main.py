@@ -31,7 +31,10 @@ class monster_main():
     ]
 
     sound_atk = None
+    sound_skill = None
     sound_buf = None
+
+    image_skill = None
 
     def hp_percentage(self):
         return self.hp / self.max_hp
@@ -71,9 +74,14 @@ class monster_main():
         self.action_time = 1
         self.sx = -100
 
+        if monster_main.image_skill == None:
+            monster_main.image_skill = load_image('./src/boss_sk2.png')
         if monster_main.sound_atk == None:
-            monster_main.sound_atk = load_wav("./src/boss_at.wav")
-            monster_main.sound_atk.set_volume(32)
+            monster_main.sound_atk = load_wav("./src/boss_atk.wav")
+            monster_main.sound_atk.set_volume(100)
+        if monster_main.sound_skill == None:
+            monster_main.sound_skill = load_wav("./src/boss_at.wav")
+            monster_main.sound_skill.set_volume(32)
         if monster_main.sound_buf == None:
             monster_main.sound_buf = load_wav("./src/boss_sk.wav")
             monster_main.sound_buf.set_volume(32)
@@ -148,7 +156,7 @@ class monster_main():
     def skill2(self, frame_time, pointXY):
         self.framesec2 += frame_time
         if self.is_sound_on:
-            monster_main.sound_atk.play()
+            monster_main.sound_skill.play()
             self.is_sound_on = False
         if self.framesec2 >= (self.action_time*2 / self.actionspd):
             self.is_sound_on = True
@@ -177,15 +185,19 @@ class monster_main():
     def draw(self):
         if self.monster_type == 1:
             if self.state >= self.ATKWAIT:
-                x = (self.ATKWAIT * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
+                y = (self.ATKWAIT * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
             else:
-                x = (self.state * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
+                y = (self.state * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
         else:
             if self.state >= self.ATK:
-                x = (self.ATK * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
+                y = (self.ATK * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
             else:
-                x = (self.state * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
-        self.monster_image.clip_draw((self.frame*self.image_size_x), x, self.image_size_x, self.image_size_y, self.sx, self.y)
+                y = (self.state * self.image_size_y*2) + (self.seeside * self.image_size_y//2) + self.image_size_y//2
+
+        if self.state == self.SKILL2:
+            monster_main.image_skill.clip_draw(0, (self.frame*120), 300, 120, self.sx+(220*self.seeside), self.y)
+
+        self.monster_image.clip_draw((self.frame*self.image_size_x), y, self.image_size_x, self.image_size_y, self.sx, self.y)
 
     def draw_hitbox(self):
         draw_rectangle(*self.hitbox(0))

@@ -49,13 +49,14 @@ class stage_controller():
             (4, 2800, 450),
              (1, 1600, 75)],
             [(5, 1600, 450),
-             (7, 800, 290),
-             (7, 1200, 480),
-             (7, 1880, 290),
-             (7, 1770, 670),
-             (8, 1470, 540),
-             (8, 2080, 540),
-             (8, 2180, 350),
+             (7, 1200, 290),
+             (7, 800, 480),
+             (7, 2220, 290),
+             (7, 1670, 560),
+             (7, 2370, 610),
+             (8, 1270, 640),
+             (8, 1270, 450),
+             (8, 2080, 470),
              (9, 400, 450),
              (9, 2800, 450),
              (6, 1600, 75)],
@@ -68,7 +69,7 @@ class stage_controller():
         regen_data = [
             {"NORMAL":[(1100, 530), (1350, 200), (1870, 720), (1920, 340), (2180, 200)],
              "BOSS":[(1350, 200), (2180, 200)]},
-            {"NORMAL": [(1100, 530), (1350, 200), (1870, 720), (1920, 340), (2180, 200)],
+            {"NORMAL": [(900, 530), (1250, 200), (1870, 630), (2100, 340), (2180, 200), (2200, 660)],
              "BOSS": [(1350, 200), (2180, 200)] },
             {"NORMAL": [(1100, 530), (1350, 200), (1870, 720), (1920, 340), (2180, 200)],
              "BOSS": [(1350, 200), (2180, 200)]},
@@ -194,7 +195,7 @@ class stage_controller():
         self._item.append(item.item(type, (1000, 350)))
 
     def monster_gen(self):
-        self.Monster.append(monster_sub.monster_sub(self.stage * 30 - 10, self.regenpoint[randint(0, 4)], self.stage - 1))
+        self.Monster.append(monster_sub.monster_sub(self.stage * 30 - 10, self.regenpoint[randint(0, len(self.regenpoint)-1)], self.stage - 1))
 
     def update(self, frame_time, pointXY):
         self.window_left = clamp(0, int(self.center_object.x) - self.canvas_width//2, self.w - self.canvas_width)
@@ -218,7 +219,7 @@ class stage_controller():
         self.regen_time += frame_time
         if self.stage < 3:
             if self.regen_time >= self._Regen_time and self.BOSS_Alive:
-                self.Monster.append(monster_sub.monster_sub(self.stage * 30 - 10, self.regenpoint[randint(0, 4)], self.stage-1))
+                self.Monster.append(monster_sub.monster_sub(self.stage * 30 - 10, self.regenpoint[randint(0, len(self.regenpoint)-1)], self.stage-1))
                 self.regen_time = 0
                 self.gen_count += 1
             if self.gen_count >= 1  and not self.BOSS:

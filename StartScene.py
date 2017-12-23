@@ -8,12 +8,15 @@ UP, DOWN, SPACE = 0, 1, 2
 select = 0
 bgi = None
 select_arrow = None
+sound = None
 
 def enter():
-    global select, bgi, select_arrow
+    global select, bgi, select_arrow, sound
     select = 0
     bgi = load_image('./src/bgi_main_menu.png')
     select_arrow = load_image('./src/menu_select_arrow.png')
+    sound = load_wav('./src/button_click.wav')
+    sound.set_volume(50)
 
 def exit():
     pass
@@ -40,6 +43,7 @@ def menu(input_key):#MENU 0 == start, 1 == exit
 
 
 def handle_events(frame_time):
+    global sound
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -47,10 +51,13 @@ def handle_events(frame_time):
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
+            sound.play()
             menu(UP)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
+            sound.play()
             menu(DOWN)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
+            sound.play()
             menu(SPACE)
 
 def update(frame_time):
